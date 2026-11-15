@@ -1,11 +1,19 @@
 # Proxxy — AI-Powered Email Management Platform for Personal Assistants & Clients
 
-> **AI Full-Stack Engineer Intern Assignment**  
+> **AI Full-Stack Engineer Intern Assignment Submission**  
 > An autonomous executive email orchestration platform built to eliminate the delegation bottleneck between Personal Assistants and their clients.
 
-[![Tech Stack](https://img.shields.io/badge/Stack-React%20%7C%20Node.js%20%7C%20Express%20%7C%20Gemini%20AI-blue)](#technology-stack)
-[![UI Caliber](https://img.shields.io/badge/UI-Superhuman%20%2F%20Linear%20Caliber-emerald)](#uiux-architecture)
-[![Status](https://img.shields.io/badge/Status-Functional%20Prototype%20Ready-green)](#quick-start-guide)
+[![Live Deployed App](https://img.shields.io/badge/Live%20Demo-proxxy--3ooz.onrender.com-success?style=for-the-badge&logo=render)](https://proxxy-3ooz.onrender.com)
+[![Tech Stack](https://img.shields.io/badge/Stack-React%2019%20%7C%20Node.js%20%7C%20Express%205%20%7C%20MongoDB%20Atlas%20%7C%20Gemini%20AI-blue?style=for-the-badge)](#technology-stack)
+[![Status](https://img.shields.io/badge/Status-100%25%20Live%20%26%20Functional-emerald?style=for-the-badge)](#live-deployed-links)
+
+---
+
+## 🌐 Live Deployed Links
+
+- **Working Web Application Prototype:** [https://proxxy-3ooz.onrender.com](https://proxxy-3ooz.onrender.com)
+- **API Health Check & Diagnostics:** [https://proxxy-3ooz.onrender.com/api/health](https://proxxy-3ooz.onrender.com/api/health)
+- **Emails REST Endpoint (MongoDB Atlas):** [https://proxxy-3ooz.onrender.com/api/emails](https://proxxy-3ooz.onrender.com/api/emails)
 
 ---
 
@@ -95,9 +103,8 @@ In `backend/.env`:
 ```env
 PORT=5000
 GEMINI_API_KEY=your_gemini_api_key_here # Optional: enables live Gemini LLM API calls
-MONGO_URI=your_mongodb_atlas_connection_string # Optional
+MONGO_URI=mongodb+srv://username:password@cluster.mongodb.net/proxxy?retryWrites=true&w=majority
 ```
-> *Note: Even without an API key, Proxxy runs in Enhanced Hybrid AI Mode with live heuristic intelligence so the app is always functional.*
 
 ### 3. Build & Run the Application
 
