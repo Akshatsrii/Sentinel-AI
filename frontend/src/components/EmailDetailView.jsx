@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { 
-  Sparkles, 
   Send, 
   CheckCircle2, 
   Clock, 
@@ -11,20 +10,20 @@ import {
   RotateCcw, 
   Edit3, 
   CornerUpRight,
-  ShieldAlert,
   ChevronDown,
-  ThumbsUp,
   Inbox,
-  ArrowRight,
   Copy,
-  Check
+  Check,
+  Cpu,
+  ShieldCheck,
+  Zap,
+  ArrowRight
 } from 'lucide-react';
 import { api } from '../services/api';
 
 export default function EmailDetailView({
   email,
   onRefreshEmail,
-  onClose,
   currentRole = 'assistant'
 }) {
   const [activeTab, setActiveTab] = useState('conversation'); // 'conversation' | 'summary' | 'actions'
@@ -45,13 +44,13 @@ export default function EmailDetailView({
 
   if (!email) {
     return (
-      <div className="h-full flex flex-col items-center justify-center p-8 text-center bg-white rounded-2xl border border-slate-200 shadow-xs">
-        <div className="w-16 h-16 rounded-2xl bg-slate-100 flex items-center justify-center text-slate-400 mb-4">
-          <Inbox className="w-8 h-8" />
+      <div className="h-full flex flex-col items-center justify-center p-8 text-center bg-white rounded-lg border border-zinc-200">
+        <div className="w-12 h-12 rounded-lg bg-zinc-100 flex items-center justify-center text-zinc-400 mb-3">
+          <Inbox className="w-6 h-6" />
         </div>
-        <h3 className="text-base font-bold text-slate-800">No email selected</h3>
-        <p className="text-xs text-slate-500 max-w-sm mt-1">
-          Select an email thread from the inbox to review AI classification, conversation history, and generate approved replies.
+        <h3 className="text-sm font-semibold text-zinc-900">No thread selected</h3>
+        <p className="text-xs text-zinc-500 max-w-xs mt-1">
+          Select a conversation from the index to review AI classification, conversation history, and agent proposed actions.
         </p>
       </div>
     );
@@ -122,84 +121,42 @@ export default function EmailDetailView({
     setTimeout(() => setCopied(false), 2000);
   };
 
-  // Color styles based on responsibility
-  const getBadgeStyles = (resp) => {
-    switch (resp) {
-      case 'Client to Reply':
-        return {
-          bg: 'bg-purple-50',
-          text: 'text-purple-700',
-          border: 'border-purple-200',
-          iconColor: 'text-purple-600',
-          dot: 'bg-purple-500'
-        };
-      case 'Assistant to Reply':
-        return {
-          bg: 'bg-indigo-50',
-          text: 'text-indigo-700',
-          border: 'border-indigo-200',
-          iconColor: 'text-indigo-600',
-          dot: 'bg-indigo-500'
-        };
-      case 'Needs Review':
-        return {
-          bg: 'bg-amber-50',
-          text: 'text-amber-700',
-          border: 'border-amber-200',
-          iconColor: 'text-amber-600',
-          dot: 'bg-amber-500'
-        };
-      case 'No Reply Needed':
-      default:
-        return {
-          bg: 'bg-slate-100',
-          text: 'text-slate-600',
-          border: 'border-slate-200',
-          iconColor: 'text-slate-500',
-          dot: 'bg-slate-400'
-        };
-    }
-  };
-
-  const badgeStyle = getBadgeStyles(email.ai?.responsibility);
-
   return (
-    <div className="h-full flex flex-col bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
+    <div className="h-full flex flex-col bg-white rounded-lg border border-zinc-200 overflow-hidden font-sans">
       
       {/* 1. Header with Subject & Core Metadata */}
-      <div className="p-5 border-b border-slate-200 bg-slate-50/50">
-        <div className="flex items-start justify-between gap-4">
+      <div className="p-4 border-b border-zinc-200 bg-zinc-50/70">
+        <div className="flex items-start justify-between gap-3">
           <div>
             <div className="flex items-center space-x-2 mb-1.5 flex-wrap gap-y-1">
-              <span className={`inline-flex items-center space-x-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold ${badgeStyle.bg} ${badgeStyle.text} border ${badgeStyle.border}`}>
-                <span className={`w-2 h-2 rounded-full ${badgeStyle.dot}`}></span>
+              <span className="inline-flex items-center space-x-1.5 px-2 py-0.5 rounded text-xs font-mono font-semibold bg-zinc-900 text-zinc-100 border border-zinc-800">
                 <span>{email.ai?.responsibility || 'Unclassified'}</span>
                 {email.ai?.confidence && (
-                  <span className="opacity-70 font-normal">({email.ai.confidence}%)</span>
+                  <span className="text-zinc-400 font-normal">({email.ai.confidence}%)</span>
                 )}
               </span>
 
               {email.ai?.priority && (
-                <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${
+                <span className={`px-1.5 py-0.2 rounded font-mono text-[10px] uppercase font-bold ${
                   email.ai.priority === 'Urgent'
-                    ? 'bg-red-100 text-red-700 border border-red-200'
+                    ? 'bg-rose-50 text-rose-700 border border-rose-200'
                     : email.ai.priority === 'High'
-                    ? 'bg-orange-100 text-orange-700 border border-orange-200'
-                    : 'bg-slate-100 text-slate-600'
+                    ? 'bg-amber-50 text-amber-700 border border-amber-200'
+                    : 'bg-zinc-100 text-zinc-600'
                 }`}>
-                  {email.ai.priority} Priority
+                  {email.ai.priority}
                 </span>
               )}
 
               {email.status === 'handled' && (
-                <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">
+                <span className="inline-flex items-center px-1.5 py-0.2 rounded font-mono text-[10px] font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">
                   <CheckCircle2 className="w-3 h-3 mr-1" />
                   Resolved
                 </span>
               )}
             </div>
 
-            <h2 className="text-lg font-bold text-slate-900 leading-snug">
+            <h2 className="text-base font-bold text-zinc-900 leading-snug">
               {email.subject}
             </h2>
           </div>
@@ -208,44 +165,44 @@ export default function EmailDetailView({
           <div className="relative shrink-0">
             <button
               onClick={() => setOverrideDropdownOpen(!overrideDropdownOpen)}
-              className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-xs font-semibold text-slate-700 shadow-xs transition-all"
+              className="inline-flex items-center space-x-1.5 px-2.5 py-1 rounded-md border border-zinc-200 bg-white hover:bg-zinc-50 text-xs font-medium text-zinc-700 transition-all cursor-pointer"
             >
-              <Edit3 className="w-3.5 h-3.5 text-slate-500" />
-              <span>Change Responsibility</span>
-              <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
+              <Edit3 className="w-3 h-3 text-zinc-500" />
+              <span>Change Status</span>
+              <ChevronDown className="w-3 h-3 text-zinc-400" />
             </button>
 
             {overrideDropdownOpen && (
-              <div className="absolute right-0 mt-1 w-52 bg-white rounded-xl shadow-xl border border-slate-200 py-1.5 z-20 animate-in fade-in zoom-in-95">
-                <div className="px-3 py-1 text-[10px] font-bold uppercase text-slate-400">
-                  Override AI Responsibility
+              <div className="absolute right-0 mt-1 w-48 bg-white rounded-lg shadow-lg border border-zinc-200 py-1 z-20 font-sans">
+                <div className="px-3 py-1 text-[10px] font-mono uppercase text-zinc-400">
+                  Override Assignment
                 </div>
                 <button
                   onClick={() => handleOverride('Assistant to Reply')}
-                  className="w-full text-left px-3 py-1.5 text-xs text-indigo-700 hover:bg-indigo-50 font-medium flex items-center space-x-2"
+                  className="w-full text-left px-3 py-1.5 text-xs text-sky-900 hover:bg-sky-50 font-medium flex items-center space-x-2"
                 >
-                  <span className="w-2 h-2 rounded-full bg-indigo-500"></span>
+                  <span className="w-1.5 h-1.5 rounded-full bg-sky-500"></span>
                   <span>Assistant to Reply</span>
                 </button>
                 <button
                   onClick={() => handleOverride('Client to Reply')}
-                  className="w-full text-left px-3 py-1.5 text-xs text-purple-700 hover:bg-purple-50 font-medium flex items-center space-x-2"
+                  className="w-full text-left px-3 py-1.5 text-xs text-purple-900 hover:bg-purple-50 font-medium flex items-center space-x-2"
                 >
-                  <span className="w-2 h-2 rounded-full bg-purple-500"></span>
+                  <span className="w-1.5 h-1.5 rounded-full bg-purple-500"></span>
                   <span>Client to Reply</span>
                 </button>
                 <button
                   onClick={() => handleOverride('Needs Review')}
-                  className="w-full text-left px-3 py-1.5 text-xs text-amber-700 hover:bg-amber-50 font-medium flex items-center space-x-2"
+                  className="w-full text-left px-3 py-1.5 text-xs text-amber-900 hover:bg-amber-50 font-medium flex items-center space-x-2"
                 >
-                  <span className="w-2 h-2 rounded-full bg-amber-500"></span>
+                  <span className="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
                   <span>Needs Review</span>
                 </button>
                 <button
                   onClick={() => handleOverride('No Reply Needed')}
-                  className="w-full text-left px-3 py-1.5 text-xs text-slate-600 hover:bg-slate-100 font-medium flex items-center space-x-2"
+                  className="w-full text-left px-3 py-1.5 text-xs text-zinc-700 hover:bg-zinc-100 font-medium flex items-center space-x-2"
                 >
-                  <span className="w-2 h-2 rounded-full bg-slate-400"></span>
+                  <span className="w-1.5 h-1.5 rounded-full bg-zinc-400"></span>
                   <span>No Reply Needed</span>
                 </button>
               </div>
@@ -253,128 +210,117 @@ export default function EmailDetailView({
           </div>
         </div>
 
-        {/* Sender details row */}
-        <div className="mt-3 flex items-center justify-between text-xs text-slate-600 pt-3 border-t border-slate-200/60">
-          <div className="flex items-center space-x-2.5">
+        {/* Sender details */}
+        <div className="mt-2.5 flex items-center justify-between text-xs text-zinc-600 pt-2.5 border-t border-zinc-200/80">
+          <div className="flex items-center space-x-2 truncate">
             <img
               src={email.sender?.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100'}
               alt={email.sender?.name}
-              className="w-7 h-7 rounded-full object-cover border border-slate-200"
+              className="w-5 h-5 rounded-full object-cover border border-zinc-300"
             />
-            <div>
-              <span className="font-semibold text-slate-800">{email.sender?.name}</span>
-              <span className="text-slate-400 ml-1.5">({email.sender?.email})</span>
-              {email.sender?.company && (
-                <span className="ml-2 px-1.5 py-0.5 rounded text-[10px] bg-slate-100 text-slate-600 font-medium">
-                  {email.sender.company}
-                </span>
-              )}
-            </div>
-          </div>
-
-          <div className="flex items-center space-x-3 text-slate-400">
-            <span>{new Date(email.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</span>
-          </div>
-        </div>
-      </div>
-
-      {/* 2. AI Intelligence Banner (Reason & Next Action) */}
-      <div className={`p-4 border-b border-slate-200 ${badgeStyle.bg}/60 flex items-start justify-between gap-4`}>
-        <div className="flex items-start space-x-3">
-          <div className={`w-8 h-8 rounded-xl bg-white flex items-center justify-center shrink-0 border ${badgeStyle.border} shadow-2xs`}>
-            <Sparkles className={`w-4 h-4 ${badgeStyle.iconColor}`} />
-          </div>
-          <div>
-            <div className="flex items-center space-x-2">
-              <span className="text-xs font-bold text-slate-800">AI Intelligence Analysis</span>
-              {email.ai?.isManualOverride && (
-                <span className="text-[10px] font-semibold text-amber-700 bg-amber-100 px-1.5 py-0.2 rounded">
-                  Manual Override
-                </span>
-              )}
-            </div>
-            <p className="text-xs text-slate-700 mt-0.5 leading-relaxed">
-              <strong>Why:</strong> {email.ai?.reason}
-            </p>
-            {email.ai?.suggestedAction && (
-              <p className="text-xs text-indigo-900 font-medium mt-1">
-                👉 <strong>Suggested Action:</strong> {email.ai.suggestedAction}
-              </p>
+            <span className="font-semibold text-zinc-900">{email.sender?.name}</span>
+            <span className="text-zinc-400 text-[11px] truncate">({email.sender?.email})</span>
+            {email.sender?.company && (
+              <span className="text-zinc-500 text-[11px]">• {email.sender.company}</span>
             )}
           </div>
-        </div>
 
-        <button
-          onClick={handleReclassify}
-          disabled={isReclassifying}
-          title="Re-run Gemini AI live analysis on thread"
-          className="shrink-0 p-1.5 text-slate-500 hover:text-indigo-600 hover:bg-white rounded-lg border border-transparent hover:border-slate-200 transition-all text-xs flex items-center space-x-1"
-        >
-          <RotateCcw className={`w-3.5 h-3.5 ${isReclassifying ? 'animate-spin text-indigo-600' : ''}`} />
-          <span className="text-[11px] font-semibold">{isReclassifying ? 'Analyzing...' : 'Re-analyze'}</span>
-        </button>
+          <span className="text-[11px] font-mono text-zinc-400 shrink-0">
+            {new Date(email.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+          </span>
+        </div>
       </div>
 
-      {/* 3. Navigation Tabs within Detail View */}
-      <div className="px-5 border-b border-slate-200 flex items-center space-x-6 bg-white text-xs font-semibold">
+      {/* 2. AI Agent Reasoning Trace Box */}
+      <div className="p-3 bg-zinc-900 text-zinc-100 border-b border-zinc-800 text-xs">
+        <div className="flex items-center justify-between mb-1.5">
+          <div className="flex items-center space-x-1.5 text-[11px] font-mono text-emerald-400">
+            <Cpu className="w-3.5 h-3.5" />
+            <span>AI AGENT REASONING ENGINE</span>
+          </div>
+
+          <button
+            onClick={handleReclassify}
+            disabled={isReclassifying}
+            className="text-[11px] font-mono text-zinc-400 hover:text-zinc-200 flex items-center space-x-1"
+          >
+            <RotateCcw className={`w-3 h-3 ${isReclassifying ? 'animate-spin text-emerald-400' : ''}`} />
+            <span>{isReclassifying ? 'Re-auditing...' : 'Re-run Agent'}</span>
+          </button>
+        </div>
+
+        <p className="text-zinc-300 leading-relaxed font-sans text-xs">
+          <strong>Decision:</strong> {email.ai?.reason}
+        </p>
+
+        {email.ai?.suggestedAction && (
+          <div className="mt-1.5 text-[11px] text-zinc-300 font-mono bg-zinc-950 p-2 rounded border border-zinc-800">
+            <span className="text-emerald-400">↳ Proposed Action: </span>
+            {email.ai.suggestedAction}
+          </div>
+        )}
+      </div>
+
+      {/* 3. Navigation Tabs */}
+      <div className="px-4 border-b border-zinc-200 flex items-center space-x-5 bg-white text-xs font-medium">
         <button
           onClick={() => setActiveTab('conversation')}
-          className={`py-3 border-b-2 transition-all flex items-center space-x-1.5 ${
+          className={`py-2.5 border-b-2 transition-all flex items-center space-x-1.5 cursor-pointer ${
             activeTab === 'conversation'
-              ? 'border-indigo-600 text-indigo-600'
-              : 'border-transparent text-slate-500 hover:text-slate-800'
+              ? 'border-zinc-900 text-zinc-900 font-semibold'
+              : 'border-transparent text-zinc-500 hover:text-zinc-800'
           }`}
         >
           <Inbox className="w-3.5 h-3.5" />
-          <span>Full Conversation ({email.messages?.length || 1})</span>
+          <span>Thread ({email.messages?.length || 1})</span>
         </button>
 
         <button
           onClick={() => setActiveTab('summary')}
-          className={`py-3 border-b-2 transition-all flex items-center space-x-1.5 ${
+          className={`py-2.5 border-b-2 transition-all flex items-center space-x-1.5 cursor-pointer ${
             activeTab === 'summary'
-              ? 'border-indigo-600 text-indigo-600'
-              : 'border-transparent text-slate-500 hover:text-slate-800'
+              ? 'border-zinc-900 text-zinc-900 font-semibold'
+              : 'border-transparent text-zinc-500 hover:text-zinc-800'
           }`}
         >
           <FileText className="w-3.5 h-3.5" />
-          <span>Structured AI Summary</span>
+          <span>Executive Summary</span>
         </button>
 
         <button
           onClick={() => setActiveTab('actions')}
-          className={`py-3 border-b-2 transition-all flex items-center space-x-1.5 ${
+          className={`py-2.5 border-b-2 transition-all flex items-center space-x-1.5 cursor-pointer ${
             activeTab === 'actions'
-              ? 'border-indigo-600 text-indigo-600'
-              : 'border-transparent text-slate-500 hover:text-slate-800'
+              ? 'border-zinc-900 text-zinc-900 font-semibold'
+              : 'border-transparent text-zinc-500 hover:text-zinc-800'
           }`}
         >
           <Calendar className="w-3.5 h-3.5" />
-          <span>Extracted Actions ({email.ai?.actionItems?.length || 0})</span>
+          <span>Extracted Tasks ({email.ai?.actionItems?.length || 0})</span>
         </button>
       </div>
 
-      {/* 4. Scrollable Main Content Area */}
-      <div className="flex-1 overflow-y-auto p-5 space-y-6">
+      {/* 4. Scrollable Content Area */}
+      <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {activeTab === 'conversation' && (
-          <div className="space-y-4">
+          <div className="space-y-3">
             {email.messages?.map((msg, index) => (
               <div
                 key={msg.id || index}
-                className="p-4 rounded-xl border border-slate-200 bg-slate-50/50 hover:bg-slate-50 transition-colors"
+                className="p-3.5 rounded-lg border border-zinc-200 bg-zinc-50/50 hover:bg-zinc-50 transition-colors"
               >
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center space-x-2">
-                    <div className="w-6 h-6 rounded-full bg-slate-200 flex items-center justify-center font-bold text-[10px] text-slate-700">
+                    <div className="w-5 h-5 rounded-full bg-zinc-200 text-zinc-700 flex items-center justify-center font-mono font-bold text-[10px]">
                       {msg.sender?.charAt(0) || 'U'}
                     </div>
-                    <span className="text-xs font-bold text-slate-800">{msg.sender}</span>
+                    <span className="text-xs font-semibold text-zinc-900">{msg.sender}</span>
                   </div>
-                  <span className="text-[11px] text-slate-400">
+                  <span className="text-[10px] font-mono text-zinc-400">
                     {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                   </span>
                 </div>
-                <div className="text-xs text-slate-700 whitespace-pre-wrap leading-relaxed">
+                <div className="text-xs text-zinc-800 whitespace-pre-wrap leading-relaxed">
                   {msg.body}
                 </div>
               </div>
@@ -383,26 +329,25 @@ export default function EmailDetailView({
         )}
 
         {activeTab === 'summary' && (
-          <div className="p-5 rounded-2xl bg-indigo-50/30 border border-indigo-100 space-y-4">
+          <div className="p-4 rounded-lg bg-zinc-50 border border-zinc-200 space-y-3 text-xs">
             <div>
-              <h4 className="text-xs font-bold uppercase tracking-wider text-indigo-900 mb-1 flex items-center space-x-1.5">
-                <FileText className="w-3.5 h-3.5 text-indigo-600" />
-                <span>Core Discussion</span>
-              </h4>
-              <p className="text-xs text-slate-700 leading-relaxed font-medium">
-                {email.ai?.summary?.discussion || 'No summary generated yet.'}
+              <div className="text-[10px] font-mono uppercase tracking-wider text-zinc-500 mb-1">
+                Core Topic
+              </div>
+              <p className="text-zinc-800 leading-relaxed font-medium">
+                {email.ai?.summary?.discussion || 'No summary available.'}
               </p>
             </div>
 
             {email.ai?.summary?.keyUpdates?.length > 0 && (
               <div>
-                <h4 className="text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
-                  Key Updates & Points
-                </h4>
-                <ul className="space-y-1.5">
+                <div className="text-[10px] font-mono uppercase tracking-wider text-zinc-500 mb-1.5">
+                  Critical Updates
+                </div>
+                <ul className="space-y-1">
                   {email.ai.summary.keyUpdates.map((item, idx) => (
-                    <li key={idx} className="text-xs text-slate-600 flex items-start space-x-2">
-                      <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 mt-1.5 shrink-0"></span>
+                    <li key={idx} className="text-zinc-700 flex items-start space-x-2">
+                      <span className="w-1 h-1 rounded-full bg-zinc-900 mt-1.5 shrink-0"></span>
                       <span>{item}</span>
                     </li>
                   ))}
@@ -410,16 +355,16 @@ export default function EmailDetailView({
               </div>
             )}
 
-            <div className="grid grid-cols-2 gap-3 pt-2">
-              <div className="p-3 bg-white rounded-xl border border-slate-200 shadow-2xs">
-                <span className="text-[10px] font-bold uppercase text-slate-400">Pending Action</span>
-                <p className="text-xs font-semibold text-slate-800 mt-0.5">
+            <div className="grid grid-cols-2 gap-2.5 pt-2">
+              <div className="p-2.5 bg-white rounded border border-zinc-200">
+                <span className="text-[10px] font-mono uppercase text-zinc-400">Pending Bottleneck</span>
+                <p className="text-xs font-semibold text-zinc-800 mt-0.5">
                   {email.ai?.summary?.pendingAction || 'None'}
                 </p>
               </div>
-              <div className="p-3 bg-white rounded-xl border border-slate-200 shadow-2xs">
-                <span className="text-[10px] font-bold uppercase text-indigo-500">Recommended Next Step</span>
-                <p className="text-xs font-semibold text-indigo-900 mt-0.5">
+              <div className="p-2.5 bg-white rounded border border-zinc-200">
+                <span className="text-[10px] font-mono uppercase text-emerald-600">Recommended Step</span>
+                <p className="text-xs font-semibold text-zinc-900 mt-0.5">
                   {email.ai?.summary?.nextStep || email.ai?.suggestedAction}
                 </p>
               </div>
@@ -428,66 +373,62 @@ export default function EmailDetailView({
         )}
 
         {activeTab === 'actions' && (
-          <div className="space-y-3">
+          <div className="space-y-2">
             {email.ai?.actionItems?.length > 0 ? (
               email.ai.actionItems.map((act) => (
                 <div
                   key={act.id}
-                  className="p-3.5 rounded-xl border border-slate-200 bg-white hover:border-indigo-300 transition-all flex items-center justify-between"
+                  className="p-3 rounded-lg border border-zinc-200 bg-white flex items-center justify-between text-xs"
                 >
-                  <div className="flex items-center space-x-3">
+                  <div className="flex items-center space-x-2.5">
                     <input
                       type="checkbox"
                       defaultChecked={act.isCompleted}
-                      className="w-4 h-4 rounded text-indigo-600 focus:ring-indigo-500 border-slate-300"
+                      className="w-3.5 h-3.5 rounded text-zinc-900 focus:ring-0 border-zinc-300"
                     />
                     <div>
-                      <p className="text-xs font-semibold text-slate-800">{act.task}</p>
-                      <div className="flex items-center space-x-2 mt-0.5 text-[11px] text-slate-500">
-                        <Clock className="w-3 h-3 text-slate-400" />
+                      <p className="font-medium text-zinc-900">{act.task}</p>
+                      <div className="flex items-center space-x-2 text-[10px] text-zinc-500 font-mono mt-0.5">
+                        <Clock className="w-3 h-3 text-zinc-400" />
                         <span>Deadline: {act.deadline}</span>
                       </div>
                     </div>
                   </div>
 
-                  <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
+                  <span className={`px-2 py-0.5 rounded text-[10px] font-mono uppercase font-bold ${
                     act.assignee === 'client'
-                      ? 'bg-purple-100 text-purple-700'
-                      : 'bg-indigo-100 text-indigo-700'
+                      ? 'bg-purple-100 text-purple-800'
+                      : 'bg-sky-100 text-sky-800'
                   }`}>
                     {act.assignee}
                   </span>
                 </div>
               ))
             ) : (
-              <p className="text-xs text-slate-500 italic p-4 text-center">
-                No actionable deadlines or calendar events extracted from this thread.
+              <p className="text-xs text-zinc-400 p-4 text-center">
+                No actionable items extracted from this thread.
               </p>
             )}
           </div>
         )}
 
-        {/* 5. AI Reply Generator Section (Core Feature) */}
-        <div className="pt-4 border-t border-slate-200">
-          <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-3">
+        {/* 5. Context-Aware AI Reply Studio */}
+        <div className="pt-3 border-t border-zinc-200">
+          <div className="p-3 rounded-lg bg-zinc-50 border border-zinc-200 space-y-2.5">
             <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-2">
-                <Sparkles className="w-4 h-4 text-indigo-600" />
-                <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wide">
-                  AI Context-Aware Reply Generator
-                </h4>
-              </div>
+              <span className="text-[11px] font-mono uppercase tracking-wider text-zinc-600 font-semibold">
+                AI Contextual Reply Generator
+              </span>
 
-              {/* Tone Selection Pills */}
-              <div className="flex items-center space-x-1.5">
+              <div className="flex items-center space-x-1">
                 {['Professional', 'Friendly', 'Short & Direct', 'Polite Decline'].map((tone) => (
                   <button
                     key={tone}
                     onClick={() => setSelectedTone(tone)}
-                    className={`px-2.5 py-1 rounded-lg text-[11px] font-medium transition-all ${
+                    className={`px-2 py-0.5 rounded text-[10px] font-medium transition-all cursor-pointer ${
                       selectedTone === tone
-                        ? 'bg-indigo-600 text-white shadow-2xs'
-                        : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-100'
+                        ? 'bg-zinc-900 text-white'
+                        : 'bg-white text-zinc-600 border border-zinc-200 hover:bg-zinc-100'
                     }`}
                   >
                     {tone}
@@ -496,59 +437,54 @@ export default function EmailDetailView({
               </div>
             </div>
 
-            {/* Custom instruction optional prompt */}
             <div className="flex items-center space-x-2">
               <input
                 type="text"
                 value={customInstructions}
                 onChange={(e) => setCustomInstructions(e.target.value)}
-                placeholder="Optional instruction: e.g. Offer Friday 10:30am instead, or confirm legal review..."
-                className="flex-1 px-3 py-1.5 text-xs bg-white border border-slate-200 rounded-lg focus:outline-hidden focus:ring-1 focus:ring-indigo-500"
+                placeholder="Custom instruction: e.g. Offer Friday 10:30 AM instead, or confirm legal review..."
+                className="flex-1 px-2.5 py-1.5 text-xs bg-white border border-zinc-200 rounded-md focus:outline-hidden focus:ring-1 focus:ring-zinc-900"
               />
               <button
                 onClick={handleGenerateReply}
                 disabled={isGeneratingReply}
-                className="px-3.5 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-semibold shadow-xs flex items-center space-x-1.5 transition-all shrink-0"
+                className="px-3 py-1.5 bg-zinc-900 hover:bg-zinc-800 text-white rounded-md text-xs font-semibold shadow-xs flex items-center space-x-1.5 transition-all cursor-pointer shrink-0"
               >
-                <Sparkles className={`w-3.5 h-3.5 ${isGeneratingReply ? 'animate-spin' : ''}`} />
-                <span>{isGeneratingReply ? 'Drafting...' : 'Generate AI Draft'}</span>
+                <span>{isGeneratingReply ? 'Synthesizing...' : 'Draft Response'}</span>
               </button>
             </div>
 
-            {/* Draft Output Box */}
             {generatedDraft && (
-              <div className="space-y-2 pt-2 animate-in fade-in duration-200">
-                <div className="flex items-center justify-between text-xs text-slate-500">
-                  <span className="font-semibold text-slate-700">Review Draft ({selectedTone} Tone)</span>
-                  <div className="flex items-center space-x-2">
-                    <button
-                      onClick={copyToClipboard}
-                      className="p-1 hover:text-slate-800 flex items-center space-x-1"
-                    >
-                      {copied ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
-                      <span>{copied ? 'Copied' : 'Copy'}</span>
-                    </button>
-                  </div>
+              <div className="space-y-2 pt-1 animate-in fade-in duration-150">
+                <div className="flex items-center justify-between text-xs text-zinc-500">
+                  <span className="font-mono text-[11px]">Preview ({selectedTone})</span>
+                  <button
+                    onClick={copyToClipboard}
+                    className="p-1 hover:text-zinc-800 flex items-center space-x-1 cursor-pointer"
+                  >
+                    {copied ? <Check className="w-3 h-3 text-emerald-600" /> : <Copy className="w-3 h-3" />}
+                    <span className="text-[10px]">{copied ? 'Copied' : 'Copy'}</span>
+                  </button>
                 </div>
 
                 <textarea
                   value={generatedDraft}
                   onChange={(e) => setGeneratedDraft(e.target.value)}
                   rows={6}
-                  className="w-full p-3 text-xs bg-white border border-slate-300 rounded-xl font-sans leading-relaxed focus:outline-hidden focus:ring-2 focus:ring-indigo-500"
+                  className="w-full p-2.5 text-xs bg-white border border-zinc-300 rounded-md font-sans leading-relaxed focus:outline-hidden focus:ring-1 focus:ring-zinc-900"
                 />
 
                 <div className="flex items-center justify-between pt-1">
-                  <span className="text-[11px] text-slate-400">
-                    Mandatory review: Reply will not be dispatched without user approval.
+                  <span className="text-[10px] font-mono text-zinc-400">
+                    Human-in-the-loop: user approval required
                   </span>
                   <button
                     onClick={handleSendReply}
                     disabled={isSendingReply}
-                    className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-semibold shadow-xs flex items-center space-x-1.5 transition-all"
+                    className="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-md text-xs font-semibold shadow-xs flex items-center space-x-1.5 transition-all cursor-pointer"
                   >
-                    <Send className={`w-3.5 h-3.5 ${isSendingReply ? 'animate-spin' : ''}`} />
-                    <span>{isSendingReply ? 'Sending...' : 'Approve & Send Reply'}</span>
+                    <Send className={`w-3 h-3 ${isSendingReply ? 'animate-spin' : ''}`} />
+                    <span>{isSendingReply ? 'Dispatching...' : 'Approve & Send'}</span>
                   </button>
                 </div>
               </div>

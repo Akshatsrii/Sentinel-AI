@@ -94,6 +94,33 @@ export const api = {
     return res.json();
   },
 
+  // Autonomous Agent Methods
+  async getAgentStatus() {
+    const res = await fetch(`${API_BASE}/agent/status`);
+    return res.json();
+  },
+
+  async getAgentLogs() {
+    const res = await fetch(`${API_BASE}/agent/logs`);
+    return res.json();
+  },
+
+  async executeAgentAction(actionId) {
+    const res = await fetch(`${API_BASE}/agent/execute-action`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ actionId })
+    });
+    return res.json();
+  },
+
+  async runAutonomousTriage() {
+    const res = await fetch(`${API_BASE}/agent/run-autonomous-triage`, {
+      method: 'POST'
+    });
+    return res.json();
+  },
+
   // AI Copilot Chat
   async aiChat(query) {
     const res = await fetch(`${API_BASE}/emails/ai-chat`, {

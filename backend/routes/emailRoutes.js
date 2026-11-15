@@ -13,6 +13,12 @@ router.patch("/emails/:id/override", emailController.overrideClassification);
 router.patch("/emails/:id/delegate", emailController.delegateToAssistant);
 router.patch("/emails/:id/status", emailController.updateStatus);
 
+// Autonomous AI Agent Pipeline
+router.get("/agent/status", emailController.getAgentStatus);
+router.get("/agent/logs", emailController.getAgentLogs);
+router.post("/agent/execute-action", emailController.executeAgentAction);
+router.post("/agent/run-autonomous-triage", emailController.runAutonomousTriage);
+
 // AI Copilot & Simulation
 router.post("/emails/simulate-incoming", emailController.simulateIncomingEmail);
 router.post("/emails/ai-chat", emailController.aiChat);

@@ -1,20 +1,18 @@
 import React, { useState } from 'react';
 import { 
-  Sparkles, 
   CheckCircle2, 
   CornerDownRight, 
   Send, 
   FileText, 
   MessageSquare, 
   Clock, 
-  AlertCircle, 
   UserCheck, 
-  ShieldCheck,
+  ArrowRight, 
+  X, 
+  Mic, 
+  ExternalLink,
   ChevronRight,
-  ArrowRight,
-  ThumbsUp,
-  X,
-  ExternalLink
+  ShieldCheck
 } from 'lucide-react';
 import { api } from '../services/api';
 
@@ -27,10 +25,9 @@ export default function ClientPortal({
   const [delegatingThreadId, setDelegatingThreadId] = useState(null);
   const [delegateNote, setDelegateNote] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [approvedReplyThreadId, setApprovedReplyThreadId] = useState(null);
-  const [customReplyText, setCustomReplyText] = useState('');
+  const [isRecording, setIsRecording] = useState(false);
 
-  // Only emails requiring Client attention
+  // Filter only emails requiring Client attention
   const clientEmails = emails.filter(
     (e) => e.ai?.responsibility === 'Client to Reply' && e.status !== 'handled' && !e.isArchived
   );
@@ -67,196 +64,201 @@ export default function ClientPortal({
     }
   };
 
-  // Quick Approve AI Draft
-  const handleQuickApproveDraft = async (id, draftText) => {
-    try {
-      setIsSubmitting(true);
-      await api.sendReply(id, draftText, 'client');
-      setApprovedReplyThreadId(null);
-      await onRefresh();
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setIsSubmitting(false);
-    }
+  // Voice note simulation
+  const handleSimulateVoice = () => {
+    setIsRecording(true);
+    setTimeout(() => {
+      setDelegateNote('Sarah, please review the valuation clause with Wilson Sonsini and schedule a 15-min call for Friday.');
+      setIsRecording(false);
+    }, 1200);
   };
 
   return (
-    <div className="max-w-4xl mx-auto py-8 px-4 sm:px-6">
+    <div className="max-w-3xl mx-auto py-8 px-4 sm:px-6 font-sans">
       
-      {/* Executive Welcome Card */}
-      <div className="bg-gradient-to-r from-purple-900 via-indigo-900 to-slate-900 rounded-3xl p-6 sm:p-8 text-white shadow-xl mb-8 relative overflow-hidden">
-        <div className="relative z-10">
-          <div className="flex items-center space-x-2 text-purple-300 text-xs font-semibold uppercase tracking-wider mb-2">
-            <UserCheck className="w-4 h-4" />
-            <span>Executive Decision Hub • Alex Vance</span>
+      {/* Executive Command Card */}
+      <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-6 sm:p-7 text-zinc-100 shadow-xl mb-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <div className="flex items-center space-x-2 text-zinc-400 text-xs font-mono mb-1">
+              <UserCheck className="w-3.5 h-3.5 text-purple-400" />
+              <span>EXECUTIVE ACTION DESK • ALEX VANCE</span>
+            </div>
+            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-white">
+              {clientEmails.length === 0
+                ? 'Inbox Zero • No Pending Decisions'
+                : `${clientEmails.length} High-Stakes Item${clientEmails.length === 1 ? '' : 's'} Requiring Decision`}
+            </h1>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
-            {clientEmails.length === 0
-              ? 'Inbox Zero! All client matters handled.'
-              : `You have ${clientEmails.length} high-priority email${clientEmails.length === 1 ? '' : 's'} requiring decision.`}
-          </h1>
-          <p className="text-purple-200 text-xs sm:text-sm mt-2 max-w-xl leading-relaxed">
-            Distraction-free portal. Routine scheduling, logistics, and newsletters are managed by Sarah Jenkins. Only items needing your personal approval or signature appear here.
-          </p>
+
+          <div className="text-right hidden sm:block">
+            <span className="text-[10px] font-mono text-zinc-500 uppercase">Executive Assistant</span>
+            <div className="text-xs font-semibold text-zinc-300">Sarah Jenkins (Active)</div>
+          </div>
         </div>
 
-        {/* Ambient background glow */}
-        <div className="absolute right-0 bottom-0 translate-x-12 translate-y-12 w-64 h-64 bg-purple-500/20 rounded-full blur-3xl pointer-events-none"></div>
+        <p className="text-zinc-400 text-xs mt-2 max-w-xl leading-relaxed">
+          Operational scheduling, flight receipts, and routine supplier logistics are handled by Sarah. Only items requiring your personal authority, signature, or strategic approval appear here.
+        </p>
       </div>
 
       {/* Main Attention List */}
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <h2 className="text-sm font-bold uppercase tracking-wider text-slate-500 flex items-center space-x-2">
-            <span>Pending Client Attention</span>
-            <span className="w-2 h-2 rounded-full bg-purple-500 animate-pulse"></span>
-          </h2>
-          <span className="text-xs text-slate-400">
-            Auto-filtered by AI Email Intelligence
-          </span>
+      <div className="space-y-4">
+        <div className="flex items-center justify-between text-xs text-zinc-500 font-mono">
+          <span className="uppercase tracking-wider">Pending Executive Review</span>
+          <span>Filtered by Autonomous Agent</span>
         </div>
 
         {clientEmails.length === 0 ? (
-          <div className="p-12 text-center bg-white rounded-3xl border border-slate-200 shadow-xs">
-            <div className="w-16 h-16 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center mx-auto mb-4">
-              <CheckCircle2 className="w-8 h-8" />
+          <div className="p-10 text-center bg-white rounded-xl border border-zinc-200">
+            <div className="w-12 h-12 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center mx-auto mb-3">
+              <CheckCircle2 className="w-6 h-6" />
             </div>
-            <h3 className="text-base font-bold text-slate-800">You are all caught up!</h3>
-            <p className="text-xs text-slate-500 mt-1 max-w-md mx-auto">
-              No pending approvals, term sheets, or executive negotiations require your input. Sarah has full visibility on operational emails.
+            <h3 className="text-sm font-semibold text-zinc-900">All Executive Matters Resolved</h3>
+            <p className="text-xs text-zinc-500 mt-1 max-w-sm mx-auto">
+              No outstanding term sheets, contracts, or candidate counter-offers require your sign-off.
             </p>
           </div>
         ) : (
-          <div className="space-y-4">
+          <div className="space-y-3">
             {clientEmails.map((email) => (
               <div
                 key={email.id}
-                className="bg-white rounded-2xl border border-purple-100 shadow-sm hover:shadow-md transition-all overflow-hidden"
+                className="bg-white rounded-xl border border-zinc-200 shadow-2xs hover:border-zinc-300 transition-all overflow-hidden"
               >
-                {/* Header row */}
-                <div className="p-6 border-b border-slate-100">
-                  <div className="flex items-start justify-between gap-4">
+                {/* Header */}
+                <div className="p-5 border-b border-zinc-100">
+                  <div className="flex items-start justify-between gap-3">
                     <div className="flex items-center space-x-3">
                       <img
                         src={email.sender?.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100'}
                         alt={email.sender?.name}
-                        className="w-10 h-10 rounded-full object-cover border border-purple-200"
+                        className="w-9 h-9 rounded-full object-cover border border-zinc-300"
                       />
                       <div>
                         <div className="flex items-center space-x-2">
-                          <h3 className="font-bold text-slate-900 text-sm sm:text-base">
+                          <h3 className="font-semibold text-zinc-900 text-sm">
                             {email.sender?.name}
                           </h3>
                           {email.sender?.company && (
-                            <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-slate-100 text-slate-700">
-                              {email.sender.company}
+                            <span className="text-[11px] font-mono text-zinc-500">
+                              • {email.sender.company}
                             </span>
                           )}
                         </div>
-                        <p className="text-xs text-slate-400 mt-0.5">
+                        <p className="text-[11px] font-mono text-zinc-400 mt-0.5">
                           Received {new Date(email.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
                         </p>
                       </div>
                     </div>
 
                     <div className="flex items-center space-x-2">
-                      <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-purple-50 text-purple-700 border border-purple-200">
+                      <span className="px-2 py-0.5 rounded text-[11px] font-mono font-bold bg-purple-50 text-purple-800 border border-purple-200">
                         Client to Reply
                       </span>
                       {email.ai?.priority === 'Urgent' && (
-                        <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-red-100 text-red-700 uppercase">
+                        <span className="px-1.5 py-0.2 rounded text-[10px] font-mono font-bold bg-rose-50 text-rose-700 uppercase">
                           Urgent
                         </span>
                       )}
                     </div>
                   </div>
 
-                  <h4 className="text-base font-bold text-slate-800 mt-3 leading-snug">
+                  <h4 className="text-sm font-bold text-zinc-900 mt-2.5 leading-snug">
                     {email.subject}
                   </h4>
 
-                  {/* AI Why input needed callout */}
-                  <div className="mt-4 p-3.5 rounded-xl bg-purple-50/70 border border-purple-200/80">
-                    <div className="flex items-center space-x-2 text-purple-900 font-bold text-xs mb-1">
-                      <Sparkles className="w-3.5 h-3.5 text-purple-600" />
-                      <span>Why your response is needed:</span>
+                  {/* Why client response needed */}
+                  <div className="mt-3 p-3 rounded-lg bg-zinc-50 border border-zinc-200 text-xs">
+                    <div className="text-[10px] font-mono uppercase font-bold text-purple-900 mb-0.5">
+                      Why Your Authority Is Required:
                     </div>
-                    <p className="text-xs text-purple-900/90 leading-relaxed font-medium">
+                    <p className="text-zinc-800 leading-relaxed font-medium">
                       {email.ai?.reason}
                     </p>
                   </div>
 
-                  {/* AI TL;DR Summary */}
+                  {/* Summary */}
                   {email.ai?.summary?.discussion && (
-                    <div className="mt-3 text-xs text-slate-600 bg-slate-50 p-3 rounded-xl border border-slate-200/60">
-                      <strong className="text-slate-800">Summary: </strong>
+                    <div className="mt-2 text-xs text-zinc-600">
+                      <strong className="text-zinc-900">Summary: </strong>
                       {email.ai.summary.discussion}
                     </div>
                   )}
                 </div>
 
-                {/* Delegation form if open */}
+                {/* Delegation form */}
                 {delegatingThreadId === email.id && (
-                  <div className="p-4 bg-indigo-50/50 border-b border-indigo-100 space-y-3 animate-in fade-in">
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-bold text-indigo-900">
-                        Delegate to Sarah (Personal Assistant):
+                  <div className="p-3.5 bg-zinc-900 text-zinc-100 border-b border-zinc-800 space-y-2.5 animate-in fade-in">
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="font-semibold text-zinc-200">
+                        Direct Instruction for Sarah Jenkins:
                       </span>
                       <button
                         onClick={() => setDelegatingThreadId(null)}
-                        className="text-slate-400 hover:text-slate-600 text-xs"
+                        className="text-zinc-400 hover:text-zinc-200"
                       >
                         Cancel
                       </button>
                     </div>
-                    <input
-                      type="text"
-                      value={delegateNote}
-                      onChange={(e) => setDelegateNote(e.target.value)}
-                      placeholder="e.g. Please decline politely or schedule for next Tuesday..."
-                      className="w-full px-3 py-2 text-xs bg-white border border-indigo-200 rounded-lg focus:outline-hidden focus:ring-2 focus:ring-indigo-500"
-                    />
+
+                    <div className="relative">
+                      <input
+                        type="text"
+                        value={delegateNote}
+                        onChange={(e) => setDelegateNote(e.target.value)}
+                        placeholder="e.g. Please decline politely or schedule for next Tuesday..."
+                        className="w-full px-3 py-2 pr-10 text-xs bg-zinc-800 border border-zinc-700 rounded text-zinc-100 focus:outline-hidden focus:ring-1 focus:ring-emerald-400"
+                      />
+                      <button
+                        onClick={handleSimulateVoice}
+                        title="Simulate Voice Dictation"
+                        className={`absolute right-2 top-1/2 -translate-y-1/2 p-1 text-zinc-400 hover:text-emerald-400 ${
+                          isRecording ? 'text-rose-400 animate-pulse' : ''
+                        }`}
+                      >
+                        <Mic className="w-4 h-4" />
+                      </button>
+                    </div>
+
                     <div className="flex justify-end space-x-2">
                       <button
                         onClick={() => handleDelegate(email.id)}
                         disabled={isSubmitting}
-                        className="px-4 py-1.5 text-xs font-semibold bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 shadow-xs"
+                        className="px-3 py-1.5 text-xs font-semibold bg-emerald-600 hover:bg-emerald-500 text-white rounded transition-all cursor-pointer"
                       >
-                        {isSubmitting ? 'Delegating...' : 'Transfer to Assistant Queue'}
+                        {isSubmitting ? 'Transferring...' : 'Transfer to Assistant Queue'}
                       </button>
                     </div>
                   </div>
                 )}
 
-                {/* Footer Action Buttons */}
-                <div className="px-6 py-3.5 bg-slate-50/70 border-t border-slate-100 flex items-center justify-between flex-wrap gap-2">
+                {/* Actions Footer */}
+                <div className="px-5 py-3 bg-zinc-50 border-t border-zinc-100 flex items-center justify-between flex-wrap gap-2 text-xs">
                   <button
                     onClick={() => setSelectedThreadForReview(email)}
-                    className="text-xs font-semibold text-slate-600 hover:text-indigo-600 flex items-center space-x-1"
+                    className="font-medium text-zinc-600 hover:text-zinc-900 flex items-center space-x-1 cursor-pointer"
                   >
                     <MessageSquare className="w-3.5 h-3.5" />
-                    <span>View Conversation ({email.messages?.length || 1})</span>
+                    <span>Review Full Thread ({email.messages?.length || 1})</span>
                   </button>
 
                   <div className="flex items-center space-x-2">
-                    {/* Delegate button */}
                     <button
                       onClick={() => {
                         setDelegatingThreadId(email.id);
                         setDelegateNote('');
                       }}
-                      className="px-3 py-1.5 text-xs font-semibold rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 shadow-2xs transition-all flex items-center space-x-1.5"
+                      className="px-3 py-1.5 font-medium rounded border border-zinc-200 bg-white hover:bg-zinc-100 text-zinc-800 transition-all flex items-center space-x-1.5 cursor-pointer shadow-2xs"
                     >
-                      <CornerDownRight className="w-3.5 h-3.5 text-slate-500" />
+                      <CornerDownRight className="w-3.5 h-3.5 text-zinc-500" />
                       <span>Delegate to Sarah</span>
                     </button>
 
-                    {/* Mark as Handled */}
                     <button
                       onClick={() => handleMarkHandled(email.id)}
                       disabled={isSubmitting}
-                      className="px-4 py-1.5 text-xs font-semibold rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs transition-all flex items-center space-x-1.5"
+                      className="px-3 py-1.5 font-semibold rounded bg-zinc-900 hover:bg-zinc-800 text-white transition-all flex items-center space-x-1.5 cursor-pointer shadow-xs"
                     >
                       <CheckCircle2 className="w-3.5 h-3.5" />
                       <span>Mark Handled</span>
@@ -269,24 +271,24 @@ export default function ClientPortal({
           </div>
         )}
 
-        {/* Recently Handled Section */}
+        {/* Recently Resolved */}
         {handledEmails.length > 0 && (
-          <div className="pt-8">
-            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">
-              Recently Handled by You ({handledEmails.length})
+          <div className="pt-6">
+            <h3 className="text-xs font-mono uppercase tracking-wider text-zinc-400 mb-2">
+              Recently Resolved by Alex ({handledEmails.length})
             </h3>
-            <div className="space-y-2 opacity-75 hover:opacity-100 transition-opacity">
+            <div className="space-y-1.5">
               {handledEmails.map((email) => (
                 <div
                   key={email.id}
-                  className="p-3.5 rounded-xl border border-slate-200 bg-white flex items-center justify-between text-xs"
+                  className="p-3 rounded-lg border border-zinc-200 bg-white flex items-center justify-between text-xs"
                 >
-                  <div className="flex items-center space-x-2">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-                    <span className="font-semibold text-slate-800">{email.subject}</span>
-                    <span className="text-slate-400">({email.sender?.name})</span>
+                  <div className="flex items-center space-x-2 truncate mr-2">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                    <span className="font-medium text-zinc-800 truncate">{email.subject}</span>
+                    <span className="text-zinc-400 text-[11px] truncate">({email.sender?.name})</span>
                   </div>
-                  <span className="text-[10px] text-emerald-600 font-bold bg-emerald-50 px-2 py-0.5 rounded">
+                  <span className="text-[10px] font-mono text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded shrink-0">
                     Resolved
                   </span>
                 </div>
@@ -297,36 +299,36 @@ export default function ClientPortal({
 
       </div>
 
-      {/* Modal for Viewing Full Conversation from Client Perspective */}
+      {/* Review Dialog */}
       {selectedThreadForReview && (
-        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-2xl w-full shadow-2xl border border-slate-200 max-h-[85vh] flex flex-col overflow-hidden animate-in fade-in">
-            <div className="p-4 border-b border-slate-200 flex items-center justify-between bg-slate-50">
+        <div className="fixed inset-0 z-50 bg-zinc-950/70 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-xl max-w-xl w-full shadow-2xl border border-zinc-200 max-h-[85vh] flex flex-col overflow-hidden">
+            <div className="p-4 border-b border-zinc-200 flex items-center justify-between bg-zinc-50">
               <div>
-                <h3 className="text-sm font-bold text-slate-800">{selectedThreadForReview.subject}</h3>
-                <p className="text-xs text-slate-500">From: {selectedThreadForReview.sender?.name}</p>
+                <h3 className="text-sm font-bold text-zinc-900">{selectedThreadForReview.subject}</h3>
+                <p className="text-xs text-zinc-500 font-mono">From: {selectedThreadForReview.sender?.name}</p>
               </div>
               <button
                 onClick={() => setSelectedThreadForReview(null)}
-                className="p-1 text-slate-400 hover:text-slate-600 rounded-lg"
+                className="p-1 text-zinc-400 hover:text-zinc-600 rounded"
               >
-                <X className="w-5 h-5" />
+                <X className="w-4 h-4" />
               </button>
             </div>
 
-            <div className="p-4 overflow-y-auto space-y-3 flex-1">
+            <div className="p-4 overflow-y-auto space-y-2.5 flex-1 text-xs">
               {selectedThreadForReview.messages?.map((msg, i) => (
-                <div key={i} className="p-3.5 bg-slate-50 rounded-xl border border-slate-200 text-xs">
-                  <div className="font-semibold text-slate-700 mb-1">{msg.sender}</div>
-                  <div className="text-slate-800 whitespace-pre-wrap leading-relaxed">{msg.body}</div>
+                <div key={i} className="p-3 bg-zinc-50 rounded border border-zinc-200">
+                  <div className="font-semibold text-zinc-800 mb-1">{msg.sender}</div>
+                  <div className="text-zinc-700 whitespace-pre-wrap leading-relaxed">{msg.body}</div>
                 </div>
               ))}
             </div>
 
-            <div className="p-4 border-t border-slate-200 bg-slate-50 flex justify-end space-x-2">
+            <div className="p-3.5 border-t border-zinc-200 bg-zinc-50 flex justify-end space-x-2 text-xs">
               <button
                 onClick={() => setSelectedThreadForReview(null)}
-                className="px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-200 rounded-lg"
+                className="px-3.5 py-1.5 font-medium text-zinc-600 hover:bg-zinc-200 rounded"
               >
                 Close
               </button>
@@ -335,7 +337,7 @@ export default function ClientPortal({
                   handleMarkHandled(selectedThreadForReview.id);
                   setSelectedThreadForReview(null);
                 }}
-                className="px-4 py-2 text-xs font-semibold bg-emerald-600 text-white hover:bg-emerald-700 rounded-lg"
+                className="px-3.5 py-1.5 font-semibold bg-zinc-900 text-white hover:bg-zinc-800 rounded"
               >
                 Mark as Handled
               </button>

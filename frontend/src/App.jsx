@@ -4,8 +4,9 @@ import AssistantDashboard from './components/AssistantDashboard';
 import ClientPortal from './components/ClientPortal';
 import AccountsModal from './components/AccountsModal';
 import AICopilotDrawer from './components/AICopilotDrawer';
+import AgentActivityDrawer from './components/AgentActivityDrawer';
 import { api } from './services/api';
-import { Sparkles, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Cpu, CheckCircle2, AlertCircle } from 'lucide-react';
 
 export default function App() {
   const [currentRole, setCurrentRole] = useState('assistant'); // 'assistant' | 'client'
@@ -22,6 +23,7 @@ export default function App() {
   // Modals & Drawers
   const [isAccountsModalOpen, setIsAccountsModalOpen] = useState(false);
   const [isAIChatOpen, setIsAIChatOpen] = useState(false);
+  const [isAgentDrawerOpen, setIsAgentDrawerOpen] = useState(false);
   const [isSimulating, setIsSimulating] = useState(false);
   const [simulationToast, setSimulationToast] = useState(null);
 
@@ -88,7 +90,7 @@ export default function App() {
     }
   };
 
-  // Simulate Incoming Email with Real-Time AI Toast
+  // Simulate Incoming Email with Real-Time Senior Agent Toast
   const handleSimulateIncoming = async () => {
     try {
       setIsSimulating(true);
@@ -141,7 +143,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans">
+    <div className="min-h-screen bg-zinc-100 text-zinc-900 flex flex-col font-sans selection:bg-zinc-900 selection:text-white">
       
       {/* Top Navigation */}
       <Navbar
@@ -149,6 +151,7 @@ export default function App() {
         setCurrentRole={setCurrentRole}
         onOpenAccounts={() => setIsAccountsModalOpen(true)}
         onOpenAIChat={() => setIsAIChatOpen(true)}
+        onOpenAgentDrawer={() => setIsAgentDrawerOpen(true)}
         onSimulateEmail={handleSimulateIncoming}
         onResetDemo={handleResetDemo}
         isSimulating={isSimulating}
@@ -156,32 +159,32 @@ export default function App() {
         clientPendingCount={stats.clientToReply}
       />
 
-      {/* Real-time AI Simulation Toast Notification */}
+      {/* Real-time Agent Stream Toast */}
       {simulationToast && (
-        <div className="fixed top-20 right-6 z-50 max-w-md bg-white rounded-2xl shadow-2xl border-2 border-indigo-500 p-4 animate-in slide-in-from-top-4 duration-300">
+        <div className="fixed top-16 right-5 z-50 max-w-sm bg-zinc-900 text-zinc-100 rounded-lg shadow-2xl border border-zinc-700 p-3.5 animate-in slide-in-from-top-3 duration-200 font-sans">
           <div className="flex items-start space-x-3">
-            <div className="w-9 h-9 rounded-xl bg-indigo-100 text-indigo-700 flex items-center justify-center shrink-0">
-              <Sparkles className="w-5 h-5 text-indigo-600 animate-spin" />
+            <div className="w-7 h-7 rounded bg-emerald-950 border border-emerald-800 text-emerald-400 flex items-center justify-center shrink-0">
+              <Cpu className="w-4 h-4 animate-pulse" />
             </div>
             <div className="flex-1">
-              <div className="flex items-center justify-between">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-600">
-                  New Incoming Email Received & Classified
-                </span>
+              <div className="flex items-center justify-between text-[10px] font-mono text-emerald-400 uppercase">
+                <span>Autonomous Sentinel Event</span>
                 <button
                   onClick={() => setSimulationToast(null)}
-                  className="text-slate-400 hover:text-slate-600 text-xs"
+                  className="text-zinc-400 hover:text-white"
                 >
                   ✕
                 </button>
               </div>
-              <h4 className="text-xs font-bold text-slate-900 mt-0.5">{simulationToast.subject}</h4>
-              <p className="text-[11px] text-slate-500">From: {simulationToast.sender}</p>
+              <h4 className="text-xs font-semibold text-zinc-100 mt-0.5">{simulationToast.subject}</h4>
+              <p className="text-[11px] text-zinc-400 font-mono">From: {simulationToast.sender}</p>
 
-              <div className="mt-2 p-2 bg-indigo-50/70 rounded-lg text-xs">
-                <span className="font-bold text-indigo-900">AI Classification: </span>
-                <span className="font-semibold text-indigo-700">{simulationToast.responsibility}</span>
-                <p className="text-[11px] text-slate-600 mt-0.5">{simulationToast.reason}</p>
+              <div className="mt-2 p-2 bg-zinc-950 rounded border border-zinc-800 text-xs">
+                <div className="flex items-center space-x-1 font-mono text-[11px]">
+                  <span className="text-zinc-400">Routed to: </span>
+                  <span className="text-emerald-400 font-semibold">{simulationToast.responsibility}</span>
+                </div>
+                <p className="text-[11px] text-zinc-300 mt-1 leading-snug">{simulationToast.reason}</p>
               </div>
             </div>
           </div>
@@ -205,6 +208,7 @@ export default function App() {
             accountFilter={accountFilter}
             setAccountFilter={setAccountFilter}
             onRefreshEmail={handleRefreshSingleEmail}
+            onOpenAgentDrawer={() => setIsAgentDrawerOpen(true)}
             isLoading={isLoading}
           />
         ) : (
@@ -218,6 +222,13 @@ export default function App() {
           />
         )}
       </main>
+
+      {/* Autonomous Agent Drawer */}
+      <AgentActivityDrawer
+        isOpen={isAgentDrawerOpen}
+        onClose={() => setIsAgentDrawerOpen(false)}
+        onActionExecuted={loadEmails}
+      />
 
       {/* Accounts & Onboarding Modal */}
       <AccountsModal
