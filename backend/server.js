@@ -2,10 +2,14 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const path = require("path");
+const connectDB = require("./config/db");
 const emailRoutes = require("./routes/emailRoutes");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+
+// Connect to MongoDB Atlas (with graceful fallback)
+connectDB();
 
 // Middleware
 app.use(cors());
@@ -15,8 +19,9 @@ app.use(express.json());
 app.get("/api/health", (req, res) => {
   res.json({
     status: "ok",
-    service: "Personal Assistant AI Email Platform",
+    service: "Proxxy — Executive AI Email & Decision Platform",
     aiEngine: process.env.GEMINI_API_KEY ? "Gemini Live API" : "Enhanced Hybrid AI Heuristics",
+    database: process.env.MONGO_URI && !process.env.MONGO_URI.includes("<db_username>") ? "MongoDB Atlas" : "In-Memory Executive Store",
     timestamp: new Date().toISOString()
   });
 });
@@ -40,7 +45,7 @@ app.use((req, res) => {
 // Start Server
 app.listen(PORT, () => {
   console.log(`===================================================`);
-  console.log(`🚀 PA Email AI Platform running on http://localhost:${PORT}`);
+  console.log(`🚀 Proxxy Server running on http://localhost:${PORT}`);
   console.log(`📡 Health Check: http://localhost:${PORT}/api/health`);
   console.log(`📬 Emails API: http://localhost:${PORT}/api/emails`);
   console.log(`===================================================`);
