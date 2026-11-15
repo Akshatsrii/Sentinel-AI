@@ -1,8 +1,24 @@
+const mongoose = require("mongoose");
+const Email = require("../models/Email");
 const initialEmails = require("../data/initialEmails");
 const geminiService = require("../services/geminiService");
 const agentEngine = require("../services/agentEngine");
 
-// In-memory working database initialized with rich executive threads
+// Helper to check MongoDB live connection state
+const isDbConnected = () => mongoose.connection.readyState === 1;
+
+// Helper to persist single email changes to MongoDB
+async function persistEmail(email) {
+  if (isDbConnected() && email && email.id) {
+    try {
+      await Email.findOneAndUpdate({ id: email.id }, email, { upsert: true, new: true });
+    } catch (err) {
+      console.warn("MongoDB sync warning for thread " + email.id + ":", err.message);
+    }
+  }
+}
+
+// In-memory working cache initialized with rich executive threads
 let emails = JSON.parse(JSON.stringify(initialEmails));
 
 let accounts = [
@@ -31,9 +47,24 @@ let accounts = [
 ];
 
 // GET /api/emails
-exports.getEmails = (req, res) => {
+exports.getEmails = async (req, res) => {
   const { segment, search, priority, account } = req.query;
-  let filtered = [...emails];
+
+  // Retrieve from MongoDB Atlas if active, otherwise fallback to in-memory store
+  let sourceEmails = emails;
+  if (isDbConnected()) {
+    try {
+      const dbEmails = await Email.find({}).lean();
+      if (dbEmails && dbEmails.length > 0) {
+        sourceEmails = dbEmails;
+        emails = JSON.parse(JSON.stringify(dbEmails));
+      }
+    } catch (dbErr) {
+      console.warn("MongoDB fetch warning, using cache:", dbErr.message);
+    }
+  }
+
+  let filtered = [...sourceEmails];
 
   // Account filter
   if (account && account !== "all") {
@@ -156,14 +187,21 @@ exports.getEmails = (req, res) => {
 };
 
 // GET /api/emails/:id
-exports.getEmailById = (req, res) => {
-  const email = emails.find((e) => e.id === req.params.id);
+exports.getEmailById = async (req, res) => {
+  let email = emails.find((e) => e.id === req.params.id);
+  if (!email && isDbConnected()) {
+    try {
+      email = await Email.findOne({ id: req.params.id }).lean();
+      if (email) emails.push(email);
+    } catch (e) {}
+  }
   if (!email) {
     return res.status(404).json({ error: "Email thread not found" });
   }
 
   // Mark as read automatically when opened
   email.isUnread = false;
+  await persistEmail(email);
 
   res.json({ email });
 };
@@ -191,6 +229,9 @@ exports.classifyEmail = async (req, res) => {
     } else {
       email.status = "no_action";
     }
+
+    // Persist reclassification to MongoDB
+    await persistEmail(email);
 
     // Log agent action
     agentEngine.addExecutionLog({
@@ -223,6 +264,7 @@ exports.summarizeEmail = async (req, res) => {
   try {
     const summary = await geminiService.summarizeThread(email);
     email.ai.summary = summary;
+    await persistEmail(email);
     res.json({ success: true, summary });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -246,7 +288,7 @@ exports.generateReply = async (req, res) => {
 };
 
 // POST /api/emails/:id/send-reply
-exports.sendReply = (req, res) => {
+exports.sendReply = async (req, res) => {
   const { replyText, senderRole = "assistant" } = req.body;
   const email = emails.find((e) => e.id === req.params.id);
   if (!email) {
@@ -269,6 +311,9 @@ exports.sendReply = (req, res) => {
   email.status = "handled";
   email.isUnread = false;
 
+  // Persist to MongoDB
+  await persistEmail(email);
+
   agentEngine.addExecutionLog({
     agent: "DispatchAgent",
     action: "REPLY_DISPATCHED",
@@ -284,7 +329,7 @@ exports.sendReply = (req, res) => {
 };
 
 // PATCH /api/emails/:id/override (Manual Re-classification Override)
-exports.overrideClassification = (req, res) => {
+exports.overrideClassification = async (req, res) => {
   const { responsibility, reason, overrideBy = "assistant" } = req.body;
   const email = emails.find((e) => e.id === req.params.id);
   if (!email) {
@@ -308,6 +353,9 @@ exports.overrideClassification = (req, res) => {
     email.status = "no_action";
   }
 
+  // Persist to MongoDB
+  await persistEmail(email);
+
   agentEngine.addExecutionLog({
     agent: "HumanInTheLoopOverride",
     action: "CLASSIFICATION_OVERRIDDEN",
@@ -322,7 +370,7 @@ exports.overrideClassification = (req, res) => {
 };
 
 // PATCH /api/emails/:id/delegate (Client delegates to Assistant with instruction)
-exports.delegateToAssistant = (req, res) => {
+exports.delegateToAssistant = async (req, res) => {
   const { note = "Please handle this on my behalf." } = req.body;
   const email = emails.find((e) => e.id === req.params.id);
   if (!email) {
@@ -334,6 +382,9 @@ exports.delegateToAssistant = (req, res) => {
   email.ai.isDelegated = true;
   email.ai.delegatedNote = note;
   email.status = "pending_assistant";
+
+  // Persist to MongoDB
+  await persistEmail(email);
 
   agentEngine.addExecutionLog({
     agent: "DelegationAgent",
@@ -357,7 +408,7 @@ exports.delegateToAssistant = (req, res) => {
 };
 
 // PATCH /api/emails/:id/status (Mark handled, important, unread, archive)
-exports.updateStatus = (req, res) => {
+exports.updateStatus = async (req, res) => {
   const { status, isImportant, isUnread, isArchived } = req.body;
   const email = emails.find((e) => e.id === req.params.id);
   if (!email) {
@@ -368,6 +419,12 @@ exports.updateStatus = (req, res) => {
   if (isImportant !== undefined) email.isImportant = isImportant;
   if (isUnread !== undefined) email.isUnread = isUnread;
   if (isArchived !== undefined) email.isArchived = isArchived;
+
+  // Persist to MongoDB
+  await persistEmail(email);
+
+  res.json({ success: true, email });
+};
 
   res.json({ success: true, email });
 };
@@ -456,6 +513,15 @@ exports.simulateIncomingEmail = async (req, res) => {
 
   // Prepend to top of inbox
   emails.unshift(newThread);
+
+  // Persist new simulated email to MongoDB Atlas
+  if (isDbConnected()) {
+    try {
+      await Email.create(newThread);
+    } catch (dbErr) {
+      console.warn("MongoDB create error:", dbErr.message);
+    }
+  }
 
   // Log autonomous agent trace
   agentEngine.addExecutionLog({
@@ -551,7 +617,15 @@ exports.connectAccount = (req, res) => {
 };
 
 // POST /api/reset-demo
-exports.resetDemo = (req, res) => {
+exports.resetDemo = async (req, res) => {
   emails = JSON.parse(JSON.stringify(initialEmails));
-  res.json({ success: true, message: "Demo inbox reset to fresh state", totalEmails: emails.length });
+  if (isDbConnected()) {
+    try {
+      await Email.deleteMany({});
+      await Email.insertMany(initialEmails);
+    } catch (dbErr) {
+      console.warn("MongoDB reset error:", dbErr.message);
+    }
+  }
+  res.json({ success: true, message: "Demo inbox reset to fresh state in MongoDB & cache", totalEmails: emails.length });
 };
