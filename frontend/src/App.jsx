@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import Navbar from './components/Navbar';
-import AssistantDashboard from './components/AssistantDashboard';
-import ClientPortal from './components/ClientPortal';
+import Sidebar from './components/Sidebar';
+import ThreadList from './components/ThreadList';
+import EmailDetail from './components/EmailDetail';
+import ExecutiveBriefing from './components/ExecutiveBriefing';
 import AccountsModal from './components/AccountsModal';
 import AICopilotDrawer from './components/AICopilotDrawer';
 import AgentActivityDrawer from './components/AgentActivityDrawer';
 import { api } from './services/api';
-import { Cpu, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Cpu, CheckCircle2 } from 'lucide-react';
 
 export default function App() {
   const [currentRole, setCurrentRole] = useState('assistant'); // 'assistant' | 'client'
@@ -107,26 +108,12 @@ export default function App() {
 
         setTimeout(() => {
           setSimulationToast(null);
-        }, 6000);
+        }, 5000);
       }
     } catch (err) {
       console.error(err);
     } finally {
       setIsSimulating(false);
-    }
-  };
-
-  // Reset Demo to fresh state
-  const handleResetDemo = async () => {
-    try {
-      await api.resetDemo();
-      await loadEmails();
-      setActiveSegment('all');
-      setSearchQuery('');
-      setPriorityFilter('all');
-      setAccountFilter('all');
-    } catch (err) {
-      console.error(err);
     }
   };
 
@@ -143,29 +130,59 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-zinc-100 text-zinc-900 flex flex-col font-sans selection:bg-zinc-900 selection:text-white">
+    <div className="flex h-screen w-screen overflow-hidden bg-white text-zinc-900 font-sans antialiased">
       
-      {/* Top Navigation */}
-      <Navbar
+      {/* 1. Left Nav Rail (Sidebar) */}
+      <Sidebar
         currentRole={currentRole}
         setCurrentRole={setCurrentRole}
+        activeSegment={activeSegment}
+        setActiveSegment={setActiveSegment}
+        stats={stats}
+        accounts={accounts}
         onOpenAccounts={() => setIsAccountsModalOpen(true)}
-        onOpenAIChat={() => setIsAIChatOpen(true)}
         onOpenAgentDrawer={() => setIsAgentDrawerOpen(true)}
+        onOpenCopilot={() => setIsAIChatOpen(true)}
         onSimulateEmail={handleSimulateIncoming}
-        onResetDemo={handleResetDemo}
         isSimulating={isSimulating}
-        unreadCount={stats.unread}
-        clientPendingCount={stats.clientToReply}
       />
+
+      {/* 2. Middle & Right Panes */}
+      {currentRole === 'assistant' ? (
+        <>
+          {/* Column 2: Thread List */}
+          <ThreadList
+            emails={emails}
+            selectedEmail={selectedEmail}
+            onSelectEmail={setSelectedEmail}
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+            priorityFilter={priorityFilter}
+            setPriorityFilter={setPriorityFilter}
+            isLoading={isLoading}
+          />
+
+          {/* Column 3: Email Detail / Reading Pane */}
+          <EmailDetail
+            email={selectedEmail}
+            onRefreshEmail={handleRefreshSingleEmail}
+            currentRole="assistant"
+          />
+        </>
+      ) : (
+        /* Executive Briefing Mode (Client Persona) */
+        <ExecutiveBriefing
+          emails={emails}
+          onRefresh={loadEmails}
+          onSwitchToAssistant={() => setCurrentRole('assistant')}
+        />
+      )}
 
       {/* Real-time Agent Stream Toast */}
       {simulationToast && (
-        <div className="fixed top-16 right-5 z-50 max-w-sm bg-zinc-900 text-zinc-100 rounded-lg shadow-2xl border border-zinc-700 p-3.5 animate-in slide-in-from-top-3 duration-200 font-sans">
-          <div className="flex items-start space-x-3">
-            <div className="w-7 h-7 rounded bg-emerald-950 border border-emerald-800 text-emerald-400 flex items-center justify-center shrink-0">
-              <Cpu className="w-4 h-4 animate-pulse" />
-            </div>
+        <div className="fixed bottom-5 right-5 z-50 max-w-sm bg-zinc-900 text-zinc-100 rounded-lg shadow-2xl border border-zinc-700 p-3.5 animate-in slide-in-from-bottom-3 duration-200 font-sans">
+          <div className="flex items-start space-x-2.5">
+            <span className="w-2 h-2 rounded-full bg-emerald-400 mt-1.5 shrink-0 animate-pulse"></span>
             <div className="flex-1">
               <div className="flex items-center justify-between text-[10px] font-mono text-emerald-400 uppercase">
                 <span>Autonomous Sentinel Event</span>
@@ -176,54 +193,21 @@ export default function App() {
                   ✕
                 </button>
               </div>
-              <h4 className="text-xs font-semibold text-zinc-100 mt-0.5">{simulationToast.subject}</h4>
+              <h4 className="text-xs font-semibold text-white mt-0.5 truncate">{simulationToast.subject}</h4>
               <p className="text-[11px] text-zinc-400 font-mono">From: {simulationToast.sender}</p>
 
               <div className="mt-2 p-2 bg-zinc-950 rounded border border-zinc-800 text-xs">
-                <div className="flex items-center space-x-1 font-mono text-[11px]">
-                  <span className="text-zinc-400">Routed to: </span>
-                  <span className="text-emerald-400 font-semibold">{simulationToast.responsibility}</span>
+                <div className="font-mono text-[11px] text-emerald-400 font-semibold">
+                  {simulationToast.responsibility}
                 </div>
-                <p className="text-[11px] text-zinc-300 mt-1 leading-snug">{simulationToast.reason}</p>
+                <p className="text-[11px] text-zinc-300 mt-0.5 leading-snug">{simulationToast.reason}</p>
               </div>
             </div>
           </div>
         </div>
       )}
 
-      {/* Main Content: Dual Persona Switch */}
-      <main className="flex-1">
-        {currentRole === 'assistant' ? (
-          <AssistantDashboard
-            emails={emails}
-            stats={stats}
-            selectedEmail={selectedEmail}
-            onSelectEmail={setSelectedEmail}
-            activeSegment={activeSegment}
-            setActiveSegment={setActiveSegment}
-            searchQuery={searchQuery}
-            setSearchQuery={setSearchQuery}
-            priorityFilter={priorityFilter}
-            setPriorityFilter={setPriorityFilter}
-            accountFilter={accountFilter}
-            setAccountFilter={setAccountFilter}
-            onRefreshEmail={handleRefreshSingleEmail}
-            onOpenAgentDrawer={() => setIsAgentDrawerOpen(true)}
-            isLoading={isLoading}
-          />
-        ) : (
-          <ClientPortal
-            emails={emails}
-            onRefresh={loadEmails}
-            onOpenThreadInAssistant={(email) => {
-              setSelectedEmail(email);
-              setCurrentRole('assistant');
-            }}
-          />
-        )}
-      </main>
-
-      {/* Autonomous Agent Drawer */}
+      {/* Autonomous Agent Telemetry Drawer */}
       <AgentActivityDrawer
         isOpen={isAgentDrawerOpen}
         onClose={() => setIsAgentDrawerOpen(false)}
