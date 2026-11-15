@@ -372,6 +372,10 @@ function analyzeHeuristics(thread) {
     subject.includes("offer letter") ||
     subject.includes("equity") ||
     subject.includes("forbes") ||
+    subject.includes("budget") ||
+    bodyText.includes("budget") ||
+    bodyText.includes("review and approve") ||
+    bodyText.includes("approve the final") ||
     bodyText.includes("docusign") ||
     bodyText.includes("founder vesting") ||
     bodyText.includes("personal execution") ||
@@ -379,11 +383,11 @@ function analyzeHeuristics(thread) {
   ) {
     return {
       responsibility: "Client to Reply",
-      confidence: 95,
-      reason: "Requires executive-level approval, founder decision, or legal signature from the client.",
-      priority: "Urgent",
+      confidence: 96,
+      reason: "Personal approval required. Executive decision needed on project budget / strategic terms.",
+      priority: "High",
       sentiment: bodyText.includes("excited") || bodyText.includes("enthusiastic") ? "Positive" : "Neutral",
-      suggestedAction: "Client should review terms and approve, counter, or sign.",
+      suggestedAction: "Client must personally review budget items and approve or request revisions.",
       actionRequired: true
     };
   }

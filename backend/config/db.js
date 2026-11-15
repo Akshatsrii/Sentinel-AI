@@ -15,12 +15,17 @@ async function connectDB() {
     });
     console.log(" Connected to MongoDB Atlas successfully");
 
-    // Auto-seed initial emails if database is empty
+    // Auto-seed initial emails if database is empty or ensure thread-000 is present
     const count = await Email.countDocuments();
     if (count === 0) {
       await Email.insertMany(initialEmails);
       console.log(` Seeded ${initialEmails.length} executive email threads into MongoDB Atlas.`);
     } else {
+      const thread0Exists = await Email.findOne({ id: "thread-000" });
+      if (!thread0Exists) {
+        await Email.create(initialEmails[0]);
+        console.log(" Seeded evaluator test email (thread-000) into MongoDB Atlas.");
+      }
       console.log(` MongoDB Atlas active with ${count} existing email threads.`);
     }
     return true;

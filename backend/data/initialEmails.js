@@ -2,6 +2,64 @@
 
 const initialEmails = [
   {
+    id: "thread-000",
+    account: "alex.vance@vancecapital.io",
+    accountProvider: "google",
+    subject: "Final Project Budget Approval (Q4 Allocation)",
+    sender: {
+      name: "Jonathan Miller",
+      email: "jmiller@vancecapital.io",
+      avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&auto=format&fit=crop&q=80",
+      company: "Vance Tech Finance"
+    },
+    recipients: ["alex.vance@vancecapital.io"],
+    cc: ["sarah.jenkins@vancecapital.io"],
+    date: new Date(Date.now() - 1000 * 60 * 12).toISOString(),
+    isUnread: true,
+    isImportant: true,
+    isArchived: false,
+    status: "pending_client",
+    
+    // AI Intelligence metadata matching evaluator test
+    ai: {
+      responsibility: "Client to Reply",
+      confidence: 98,
+      reason: "Personal approval required. Executive decision needed on final project budget allocation.",
+      priority: "High",
+      sentiment: "Neutral",
+      suggestedAction: "Alex must personally review the budget line items and authorize release before tomorrow's deadline.",
+      actionRequired: true,
+      summary: {
+        discussion: "CFO Jonathan Miller requested final project budget review and formal executive sign-off by tomorrow.",
+        keyUpdates: [
+          "Consolidated engineering hiring and cloud infrastructure reserve",
+          "Total budget capped at $1.25M for Q4 allocation",
+          "Vendor purchase orders and contractor contracts waiting on Alex's direct approval"
+        ],
+        pendingAction: "Personal approval required on budget by tomorrow",
+        nextStep: "Alex Vance to approve the allocation or request line-item adjustments"
+      },
+      actionItems: [
+        {
+          id: "act-0-1",
+          task: "Review and approve final project budget",
+          deadline: "Tomorrow, 5:00 PM EST",
+          type: "approval",
+          assignee: "client",
+          isCompleted: false
+        }
+      ]
+    },
+    messages: [
+      {
+        id: "msg-000-1",
+        sender: "Jonathan Miller <jmiller@vancecapital.io>",
+        timestamp: new Date(Date.now() - 1000 * 60 * 12).toISOString(),
+        body: "Please review and approve the final project budget by tomorrow.\n\nWe have finalized the department breakdown including the cloud infrastructure expansion and Q4 contractor extensions. Total allocation comes to $1,250,000.\n\nOnce you give the green light, we will issue the vendor POs.\n\nBest,\nJonathan"
+      }
+    ]
+  },
+  {
     id: "thread-001",
     account: "alex.vance@vancecapital.io",
     accountProvider: "google",

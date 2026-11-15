@@ -7,19 +7,28 @@ import AccountsModal from './components/AccountsModal';
 import AICopilotDrawer from './components/AICopilotDrawer';
 import AgentActivityDrawer from './components/AgentActivityDrawer';
 import { api } from './services/api';
+import fallbackEmails from './data/fallbackEmails';
 import { Cpu, CheckCircle2 } from 'lucide-react';
 
 export default function App() {
   const [currentRole, setCurrentRole] = useState('assistant'); // 'assistant' | 'client'
-  const [emails, setEmails] = useState([]);
-  const [stats, setStats] = useState({});
-  const [selectedEmail, setSelectedEmail] = useState(null);
+  const [emails, setEmails] = useState(fallbackEmails);
+  const [stats, setStats] = useState({
+    total: fallbackEmails.length,
+    unread: fallbackEmails.filter((e) => e.isUnread).length,
+    assistantToReply: fallbackEmails.filter((e) => e.ai?.responsibility === 'Assistant to Reply').length,
+    clientToReply: fallbackEmails.filter((e) => e.ai?.responsibility === 'Client to Reply').length,
+    needsReview: fallbackEmails.filter((e) => e.ai?.responsibility === 'Needs Review').length,
+    noReplyNeeded: fallbackEmails.filter((e) => e.ai?.responsibility === 'No Reply Needed').length,
+    actionRequired: fallbackEmails.filter((e) => e.ai?.actionRequired).length,
+  });
+  const [selectedEmail, setSelectedEmail] = useState(fallbackEmails[0]);
   const [activeSegment, setActiveSegment] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [priorityFilter, setPriorityFilter] = useState('all');
   const [accountFilter, setAccountFilter] = useState('all');
   const [accounts, setAccounts] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
   // Modals & Drawers
