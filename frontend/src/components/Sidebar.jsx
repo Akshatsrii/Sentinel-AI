@@ -51,11 +51,11 @@ export default function Sidebar({
         {!isCollapsed && (
           <div className="flex items-center space-x-2 truncate">
             <div className="w-6 h-6 rounded bg-emerald-600 flex items-center justify-center font-bold text-xs text-white shrink-0 shadow-xs">
-              P
+              S
             </div>
             <div className="truncate">
               <div className="flex items-center space-x-1.5">
-                <h2 className="text-xs font-bold text-white tracking-tight leading-tight truncate">Proxxy</h2>
+                <h2 className="text-xs font-bold text-white tracking-tight leading-tight truncate">Sentinel</h2>
                 <span className="text-[9px] font-mono text-emerald-400 bg-emerald-950 px-1 rounded border border-emerald-800">AI</span>
               </div>
               <p className="text-[10px] text-zinc-400 font-mono truncate">Alex Vance & Sarah</p>
@@ -193,14 +193,14 @@ export default function Sidebar({
         {/* Agent Sentinel Button */}
         <button
           onClick={onOpenAgentDrawer}
-          title="Proxxy Agent Sentinel"
+          title="Sentinel Agent Engine"
           className={`w-full p-1.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 flex items-center ${isCollapsed ? 'justify-center' : 'justify-between'} text-left transition-all cursor-pointer`}
         >
           <div className="flex items-center space-x-1.5 truncate">
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shrink-0"></span>
             {!isCollapsed && (
               <div className="truncate">
-                <div className="text-[11px] font-semibold text-zinc-200 truncate">Proxxy Sentinel</div>
+                <div className="text-[11px] font-semibold text-zinc-200 truncate">Sentinel Agent</div>
                 <div className="text-[9px] font-mono text-zinc-400 truncate">Autonomous Active</div>
               </div>
             )}
@@ -222,11 +222,11 @@ export default function Sidebar({
         {/* Copilot button */}
         <button
           onClick={onOpenCopilot}
-          title="Ask Proxxy Copilot"
+          title="Ask Sentinel Copilot"
           className={`w-full py-1.5 px-2 rounded-lg bg-indigo-950/80 hover:bg-indigo-900 border border-indigo-800/80 text-[11px] font-medium text-indigo-300 flex items-center ${isCollapsed ? 'justify-center' : 'space-x-1.5 justify-center'} transition-all cursor-pointer`}
         >
           <Bot className="w-3.5 h-3.5 shrink-0" />
-          {!isCollapsed && <span className="truncate">Proxxy Copilot</span>}
+          {!isCollapsed && <span className="truncate">Sentinel Copilot</span>}
         </button>
 
       </div>

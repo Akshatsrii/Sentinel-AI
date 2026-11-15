@@ -321,7 +321,7 @@ Format your response in clean markdown with bullet points and bold highlights.`;
       `• **${noReply} emails** identified as **No Reply Needed** (AWS billing receipt, BA flights, newsletters)\n\n` +
       `*Recommended next action:* Address the 2 urgent legal/investment approvals first.`;
   } else {
-    answer = `### 🤖 Proxxy Copilot Intelligence\n\n` +
+    answer = `### 🛡️ Sentinel AI Copilot Intelligence\n\n` +
       `Regarding **"${query}"**:\n\n` +
       `I scanned all ${allEmails.length} active threads in your database. Currently, the most pressing matter is the **Apex Ventures $14M Series B Term Sheet** which expires this Friday at 5:00 PM EST, and the **IP Assignment Agreement DocuSign** which David Chen requested today.\n\n` +
       `Feel free to ask me to draft a reply, extract dates, or filter specific senders!`;

@@ -1,4 +1,4 @@
-# Proxxy — AI-Powered Email Management Platform for Personal Assistants & Clients
+# Sentinel AI — Autonomous Email Intelligence for Personal Assistants & Leaders
 
 > **AI Full-Stack Engineer Intern Assignment Submission**  
 > An autonomous executive email orchestration platform built to eliminate the delegation bottleneck between Personal Assistants and their clients.
@@ -25,7 +25,7 @@ Personal assistants (PAs) manage hundreds of emails on behalf of high-profile cl
 - Often, a client reads an email on their phone without indicating whether they plan to handle it personally or expect their assistant to draft a response.
 - Assistants are forced to manually review every single thread, chase clients for clarification, or let urgent approvals slip through the cracks.
 
-**Proxxy** solves this bottleneck with a **Dual-Persona AI Architecture**:
+**Sentinel AI** solves this bottleneck with a **Dual-Persona AI Architecture**:
 1. **Assistant Command Center:** A 3-column power workspace (Front/Superhuman caliber) with real-time analytics, automated classification, AI thread summaries, action item extraction, and smart reply drafting.
 2. **Minimalist Executive Briefing Desk:** A zero-distraction terminal for the client showing **only** emails requiring personal decisions (Series B Term Sheets, DocuSign signatures, candidate equity grants), with one-click **"Mark Resolved"**, **"Delegate to Sarah"** (with simulated Voice Dictation), or **"Approve Draft"**.
 
@@ -64,7 +64,7 @@ Drafts contextual replies based on the full conversation history:
 - **Custom Prompt Injection:** e.g., *"Offer Friday 10:30 AM instead"*.
 - **Mandatory Approval Workflow:** AI drafts are never sent automatically; user review and approval is required before dispatch.
 
-### 5. Interactive Proxxy Copilot (RAG Chatbot)
+### 5. Interactive Sentinel Copilot (RAG Chatbot)
 A dedicated natural language assistant querying live email records:
 - *"Which emails need client attention?"*
 - *"Summarize today's emails."*
@@ -130,11 +130,11 @@ Open your browser and navigate to: **`http://localhost:5000`**
 
 ## 🎬 Suggested Demo Video Walkthrough Script
 
-1. **Introduction (0:00 - 0:30):** Introduce **Proxxy** as the autonomous email proxy for personal assistants and high-profile executives.
+1. **Introduction (0:00 - 0:30):** Introduce **Sentinel AI** as the autonomous email intelligence platform for personal assistants and high-profile executives.
 2. **Assistant Workspace (0:30 - 1:15):** Walk through the 3-column layout (Front/Superhuman style), segmentation tabs, search bar, and priority chips.
 3. **AI Intelligence Engine (1:15 - 2:00):** Open the **Apex Ventures Term Sheet** ($14M lead). Show the **Client Decision** tag, the **Executive AI Briefing box**, and the **4-part summary**.
 4. **AI Reply Studio (2:00 - 2:30):** Click **AI Draft**, select **Professional** tone, and click **Approve & Send** to demonstrate human-in-the-loop review.
 5. **Real-Time Simulation (2:30 - 3:00):** Click **Simulate Mail** in the sidebar to show an incoming email being classified and routed live by the Autonomous Sentinel.
 6. **Executive Briefing Mode (3:00 - 3:45):** Switch to **Executive** in the sidebar. Show Alex Vance's minimalist desk. Demonstrate the **Mic button** (Voice Dictation) and click **Delegate to Sarah**, showing it transfer instantly to Sarah's queue.
-7. **Agent Telemetry (3:45 - 4:15):** Open **Agent Sentinel** in the sidebar to show the active sub-agent tools (`TermSheetClauseAuditor`, `CalendarInspector`) and live reasoning logs.
-8. **Proxxy Copilot (4:15 - 4:30):** Open the Copilot drawer and ask *"Which emails need client attention?"*.
+7. **Agent Telemetry (3:45 - 4:15):** Open **Sentinel Agent** in the sidebar to show the active sub-agent tools (`TermSheetClauseAuditor`, `CalendarInspector`) and live reasoning logs.
+8. **Sentinel Copilot (4:15 - 4:30):** Open the Copilot drawer and ask *"Which emails need client attention?"*.

@@ -19,7 +19,7 @@ app.use(express.json());
 app.get("/api/health", (req, res) => {
   res.json({
     status: "ok",
-    service: "Proxxy — Executive AI Email & Decision Platform",
+    service: "Sentinel AI — Executive AI Email & Decision Platform",
     aiEngine: process.env.GEMINI_API_KEY ? "Gemini Live API" : "Enhanced Hybrid AI Heuristics",
     database: process.env.MONGO_URI && !process.env.MONGO_URI.includes("<db_username>") ? "MongoDB Atlas (Connected)" : "In-Memory Executive Store",
     timestamp: new Date().toISOString()
