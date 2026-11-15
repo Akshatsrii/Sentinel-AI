@@ -1,7 +1,7 @@
 {
-  "name": "ai-personal-assistant-email-dashboard",
+  "name": "proxxy-ai",
   "version": "1.0.0",
-  "description": "Modern, intelligent AI-powered email management dashboard for Personal Assistants and Executive Clients",
+  "description": "Proxxy — Autonomous AI-Powered Email Management Platform for Personal Assistants & Clients",
   "scripts": {
     "start": "node backend/server.js",
     "build": "cd frontend && npm run build",
@@ -12,8 +12,9 @@
     "ai-email",
     "gemini",
     "executive-portal",
-    "mern"
+    "mern",
+    "proxxy"
   ],
-  "author": "",
+  "author": "Akshat Srivastava",
   "license": "ISC"
 }
