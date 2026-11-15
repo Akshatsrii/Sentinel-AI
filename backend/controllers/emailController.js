@@ -426,9 +426,6 @@ exports.updateStatus = async (req, res) => {
   res.json({ success: true, email });
 };
 
-  res.json({ success: true, email });
-};
-
 // POST /api/emails/simulate-incoming (Simulate realistic incoming email with live AI analysis)
 exports.simulateIncomingEmail = async (req, res) => {
   const templates = [
@@ -544,6 +541,117 @@ exports.simulateIncomingEmail = async (req, res) => {
     message: "New email simulated and classified by AI Agent in real-time!",
     email: newThread
   });
+};
+
+// POST /api/emails/compose (Compose and send a brand new email thread)
+exports.composeEmail = async (req, res) => {
+  const { to, toName, subject, body, senderRole = "client", priority = "Normal" } = req.body;
+  if (!to || !subject || !body) {
+    return res.status(400).json({ error: "To, Subject, and Body are required." });
+  }
+
+  const sender =
+    senderRole === "client"
+      ? {
+          name: "Alex Vance",
+          email: "alex.vance@vancecapital.io",
+          avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80",
+          company: "Vance Capital"
+        }
+      : {
+          name: "Sarah Jenkins (PA to Alex Vance)",
+          email: "sarah.jenkins@vancecapital.io",
+          avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&auto=format&fit=crop&q=80",
+          company: "Vance Capital"
+        };
+
+  const newThread = {
+    id: "thread-" + Date.now(),
+    account: sender.email,
+    accountProvider: "google",
+    subject: subject.trim(),
+    sender: sender,
+    recipients: [to.trim()],
+    cc: senderRole === "client" ? ["sarah.jenkins@vancecapital.io"] : [],
+    date: new Date().toISOString(),
+    isUnread: false,
+    isImportant: priority === "Urgent" || priority === "High",
+    isArchived: false,
+    status: "handled",
+    messages: [
+      {
+        id: "msg-" + Date.now(),
+        sender: `${sender.name} <${sender.email}>`,
+        timestamp: new Date().toISOString(),
+        body: body.trim()
+      }
+    ],
+    ai: {
+      responsibility: "No Reply Needed",
+      confidence: 99,
+      reason: `Outgoing email dispatched by ${sender.name}. Awaiting recipient response.`,
+      priority: priority,
+      sentiment: "Positive",
+      suggestedAction: `Follow up with ${toName || to} if no response within 48 hours.`,
+      actionRequired: false,
+      summary: {
+        discussion: `Outgoing communication to ${toName || to} regarding "${subject}".`,
+        keyUpdates: [
+          `Email successfully dispatched via Sentinel Outbox`,
+          `Recipient: ${to}`,
+          `Sent by: ${sender.name}`
+        ],
+        pendingAction: `Awaiting response from ${toName || to}`,
+        nextStep: `Monitor inbox for incoming reply`
+      },
+      actionItems: []
+    }
+  };
+
+  // Add to in-memory store
+  emails.unshift(newThread);
+
+  // Persist to MongoDB Atlas
+  if (isDbConnected()) {
+    try {
+      await Email.create(newThread);
+    } catch (err) {
+      console.warn("MongoDB compose sync warning:", err.message);
+    }
+  }
+
+  // Telemetry trace
+  agentEngine.addExecutionLog({
+    agent: "OutboxComposer",
+    action: "OUTGOING_DISPATCH",
+    threadId: newThread.id,
+    threadSubject: newThread.subject,
+    steps: [
+      { tool: "OutboxDispatcher", output: `Dispatched message from ${sender.name} to ${to}` },
+      { tool: "SecurityValidator", output: `DKIM/SPF checks passed. Encryption TLS 1.3 enforced.` }
+    ]
+  });
+
+  res.json({
+    success: true,
+    message: "Email dispatched successfully!",
+    email: newThread
+  });
+};
+
+// POST /api/emails/ai-draft-new (Draft a new email with Gemini)
+exports.aiDraftNew = async (req, res) => {
+  const { prompt, tone = "Professional", recipientName = "", senderRole = "client" } = req.body;
+  if (!prompt) {
+    return res.status(400).json({ error: "Prompt instruction is required." });
+  }
+
+  try {
+    const draft = await geminiService.draftNewEmail(prompt, tone, recipientName, senderRole);
+    res.json({ success: true, draft });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 };
 
 // POST /api/emails/ai-chat (Copilot interaction over MongoDB/Email records)

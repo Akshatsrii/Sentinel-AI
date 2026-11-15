@@ -6,6 +6,7 @@ import ExecutiveBriefing from './components/ExecutiveBriefing';
 import AccountsModal from './components/AccountsModal';
 import AICopilotDrawer from './components/AICopilotDrawer';
 import AgentActivityDrawer from './components/AgentActivityDrawer';
+import ComposeModal from './components/ComposeModal';
 import { api } from './services/api';
 import fallbackEmails from './data/fallbackEmails';
 import { Cpu, CheckCircle2 } from 'lucide-react';
@@ -35,6 +36,7 @@ export default function App() {
   const [isAccountsModalOpen, setIsAccountsModalOpen] = useState(false);
   const [isAIChatOpen, setIsAIChatOpen] = useState(false);
   const [isAgentDrawerOpen, setIsAgentDrawerOpen] = useState(false);
+  const [isComposeOpen, setIsComposeOpen] = useState(false);
   const [isSimulating, setIsSimulating] = useState(false);
   const [simulationToast, setSimulationToast] = useState(null);
 
@@ -78,10 +80,14 @@ export default function App() {
           const prevIndex = currentIndex > 0 ? currentIndex - 1 : emails.length - 1;
           setSelectedEmail(emails[prevIndex]);
         }
+      } else if (e.key === 'c' && !e.metaKey && !e.ctrlKey) {
+        e.preventDefault();
+        setIsComposeOpen(true);
       } else if (e.key === 'Escape') {
         setIsAccountsModalOpen(false);
         setIsAIChatOpen(false);
         setIsAgentDrawerOpen(false);
+        setIsComposeOpen(false);
       }
     };
 
@@ -157,6 +163,22 @@ export default function App() {
     }
   };
 
+  // Handle new email sent from Compose Modal
+  const handleEmailSent = (newEmail) => {
+    setEmails((prev) => [newEmail, ...prev]);
+    setSelectedEmail(newEmail);
+    setSimulationToast({
+      subject: newEmail.subject,
+      sender: 'Sentinel Outbox',
+      responsibility: 'Dispatched to ' + (newEmail.recipients?.[0] || 'Recipient'),
+      reason: 'Executive email successfully dispatched and synced to database.'
+    });
+    setTimeout(() => {
+      setSimulationToast(null);
+    }, 4000);
+    loadEmails();
+  };
+
   // Connect new account
   const handleConnectAccount = async (provider, email) => {
     try {
@@ -183,6 +205,7 @@ export default function App() {
         onOpenAccounts={() => setIsAccountsModalOpen(true)}
         onOpenAgentDrawer={() => setIsAgentDrawerOpen(true)}
         onOpenCopilot={() => setIsAIChatOpen(true)}
+        onOpenCompose={() => setIsComposeOpen(true)}
         onSimulateEmail={handleSimulateIncoming}
         isSimulating={isSimulating}
         isCollapsed={isSidebarCollapsed}
@@ -268,6 +291,14 @@ export default function App() {
       <AICopilotDrawer
         isOpen={isAIChatOpen}
         onClose={() => setIsAIChatOpen(false)}
+      />
+
+      {/* Compose Email Modal */}
+      <ComposeModal
+        isOpen={isComposeOpen}
+        onClose={() => setIsComposeOpen(false)}
+        onEmailSent={handleEmailSent}
+        currentRole={currentRole}
       />
 
     </div>

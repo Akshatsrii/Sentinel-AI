@@ -20,6 +20,8 @@ router.post("/agent/execute-action", emailController.executeAgentAction);
 router.post("/agent/run-autonomous-triage", emailController.runAutonomousTriage);
 
 // AI Copilot & Simulation
+router.post("/emails/compose", emailController.composeEmail);
+router.post("/emails/ai-draft-new", emailController.aiDraftNew);
 router.post("/emails/simulate-incoming", emailController.simulateIncomingEmail);
 router.post("/emails/ai-chat", emailController.aiChat);
 

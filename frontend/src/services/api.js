@@ -89,6 +89,26 @@ export const api = {
     return res.json();
   },
 
+  // Compose brand new email
+  async composeEmail(payload) {
+    const res = await fetch(`${API_BASE}/emails/compose`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    return res.json();
+  },
+
+  // AI Draft for new email
+  async aiDraftNew(payload) {
+    const res = await fetch(`${API_BASE}/emails/ai-draft-new`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    return res.json();
+  },
+
   // Simulate incoming email in real-time
   async simulateIncomingEmail(customData = null) {
     const res = await fetch(`${API_BASE}/emails/simulate-incoming`, {

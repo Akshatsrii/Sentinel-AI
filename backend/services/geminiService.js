@@ -184,6 +184,52 @@ Return strictly JSON:
 }
 
 /**
+ * 3.5 AI Outgoing Email Composer
+ * Generates an executive outgoing email draft from a natural language prompt.
+ */
+async function draftNewEmail(instruction, tone = "Professional", recipientName = "", senderRole = "client") {
+  const senderIdentity =
+    senderRole === "client"
+      ? "Alex Vance (Founder & Managing Partner, Vance Capital)"
+      : "Sarah Jenkins (Executive Assistant to Alex Vance)";
+
+  const prompt = `You are composing a new executive email on behalf of ${senderIdentity}.
+Recipient: ${recipientName || "Colleague / Partner"}
+User's Instruction: "${instruction}"
+Desired Tone: "${tone}" (Professional, Friendly, Executive Direct, Urgent Request)
+
+Return strictly a JSON object:
+{
+  "subject": "Clear, concise executive subject line",
+  "body": "Full professional email body ready to send with appropriate greeting and sign-off."
+}`;
+
+  if (model) {
+    try {
+      const result = await model.generateContent({
+        contents: [{ role: "user", parts: [{ text: prompt }] }],
+        generationConfig: { responseMimeType: "application/json" }
+      });
+      return JSON.parse(result.response.text());
+    } catch (err) {
+      console.warn("Gemini draft error, using fallback:", err.message);
+    }
+  }
+
+  // Fallback heuristic draft
+  const greeting = recipientName ? `Hi ${recipientName.split(" ")[0]},` : "Hi there,";
+  const signOff =
+    senderRole === "client"
+      ? "Best regards,\nAlex Vance\nManaging Partner, Vance Capital"
+      : "Best,\nSarah Jenkins\nExecutive Assistant to Alex Vance";
+
+  return {
+    subject: instruction.length > 50 ? instruction.slice(0, 47) + "..." : instruction,
+    body: `${greeting}\n\nI am writing to follow up regarding: ${instruction}.\n\nPlease let me know your thoughts or availability to sync up on this.\n\n${signOff}`
+  };
+}
+
+/**
  * 4. AI Action Item & Calendar Extractor
  */
 async function extractActionItems(thread) {
@@ -426,6 +472,7 @@ module.exports = {
   classifyEmail,
   summarizeThread,
   generateReply,
+  draftNewEmail,
   extractActionItems,
   chatWithEmails
 };
