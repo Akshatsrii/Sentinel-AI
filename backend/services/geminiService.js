@@ -8,8 +8,9 @@ let model = null;
 if (apiKey && apiKey !== "your_gemini_api_key_here") {
   try {
     genAI = new GoogleGenerativeAI(apiKey);
-    model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-    console.log(" Gemini AI Engine initialized with live API key");
+    // Use gemini-flash-latest with fallback
+    model = genAI.getGenerativeModel({ model: "gemini-flash-latest" });
+    console.log(" Gemini AI Engine initialized with live API key (gemini-flash-latest)");
   } catch (err) {
     console.warn("⚠️ Error initializing Gemini API:", err.message);
   }
@@ -102,12 +103,10 @@ Return strictly a JSON object:
     }
   }
 
-  // Fallback summary
   if (thread.ai?.summary) {
     return thread.ai.summary;
   }
 
-  const lastMsg = thread.messages?.[thread.messages.length - 1]?.body || "";
   return {
     discussion: `Conversation regarding ${thread.subject} with ${thread.sender?.name}.`,
     keyUpdates: [
@@ -129,7 +128,6 @@ async function generateReply(thread, tone = "Professional", customInstructions =
     .map((m) => `From: ${m.sender}:\n${m.body}`)
     .join("\n\n");
 
-  const lastMessage = thread.messages?.[thread.messages.length - 1];
   const senderName = thread.sender?.name || "there";
 
   const prompt = `You are drafting an executive email reply on behalf of Alex Vance (Founder/CEO) or Sarah Jenkins (Executive Assistant).
@@ -161,7 +159,6 @@ Return strictly JSON:
     }
   }
 
-  // Intelligent Contextual Reply Generator fallback
   let replyText = "";
   if (tone === "Professional") {
     replyText = `Hi ${senderName.split(" ")[0]},\n\nThank you for following up regarding "${thread.subject}".\n\nI have reviewed the details and we are aligned on moving this forward. Our team is currently finalizing the remaining prerequisites, and we will share the updated documentation shortly.\n\nPlease let us know if any additional information is required in the interim.\n\nBest regards,\nAlex Vance\nManaging Partner, Vance Capital`;
@@ -224,10 +221,8 @@ Return strictly a JSON array of items:
 
 /**
  * 5. AI Email Chatbot (Executive Copilot)
- * Queries actual database email records to answer assistant/client inquiries.
  */
 async function chatWithEmails(query, allEmails) {
-  // Prepare database context
   const emailsDigest = allEmails.map((e, idx) => ({
     index: idx + 1,
     id: e.id,
@@ -268,7 +263,6 @@ Format your response in clean markdown with bullet points and bold highlights.`;
     }
   }
 
-  // Local Intelligent Query Engine fallback
   const q = query.toLowerCase();
   let answer = "";
 
@@ -326,27 +320,8 @@ Format your response in clean markdown with bullet points and bold highlights.`;
       `• **${reviewCount} emails** flagged for **Review** (Cross-border partnership cold pitch)\n` +
       `• **${noReply} emails** identified as **No Reply Needed** (AWS billing receipt, BA flights, newsletters)\n\n` +
       `*Recommended next action:* Address the 2 urgent legal/investment approvals first.`;
-  } else if (q.includes("meeting") || q.includes("appointment") || q.includes("schedule")) {
-    const meetings = allEmails.filter(
-      (e) =>
-        e.subject.toLowerCase().includes("meeting") ||
-        e.subject.toLowerCase().includes("reschedule") ||
-        e.subject.toLowerCase().includes("dining") ||
-        e.subject.toLowerCase().includes("reservation") ||
-        e.subject.toLowerCase().includes("interview")
-    );
-    answer = `### 📅 Upcoming Meetings & Schedule Requests (${meetings.length} Found)\n\n` +
-      meetings
-        .map(
-          (e, i) =>
-            `${i + 1}. **${e.subject}** (${e.sender.name})\n` +
-            `   • **Status:** ${e.ai.suggestedAction}\n` +
-            `   • **Responsibility:** ${e.ai.responsibility}`
-        )
-        .join("\n\n");
   } else {
-    // General semantic answer
-    answer = `### 🤖 AI Inbox Intelligence\n\n` +
+    answer = `### 🤖 Proxxy Copilot Intelligence\n\n` +
       `Regarding **"${query}"**:\n\n` +
       `I scanned all ${allEmails.length} active threads in your database. Currently, the most pressing matter is the **Apex Ventures $14M Series B Term Sheet** which expires this Friday at 5:00 PM EST, and the **IP Assignment Agreement DocuSign** which David Chen requested today.\n\n` +
       `Feel free to ask me to draft a reply, extract dates, or filter specific senders!`;
