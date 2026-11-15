@@ -1,7 +1,5 @@
 <div align="center">
 
-<img src="https://raw.githubusercontent.com/Akshatsrii/Proxxy/main/assets/logo.svg" alt="Sentinel AI" width="720" />
-
 ### Autonomous Email Intelligence for Personal Assistants & Leaders
 
 **AI Full-Stack Engineer Intern Assignment Submission**
