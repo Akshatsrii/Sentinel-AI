@@ -20,6 +20,7 @@ export default function App() {
   const [accountFilter, setAccountFilter] = useState('all');
   const [accounts, setAccounts] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
   // Modals & Drawers
   const [isAccountsModalOpen, setIsAccountsModalOpen] = useState(false);
@@ -48,6 +49,36 @@ export default function App() {
   useEffect(() => {
     loadEmails();
   }, [activeSegment, searchQuery, priorityFilter, accountFilter]);
+
+  // Keyboard navigation (J / K navigation like Superhuman)
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (['INPUT', 'TEXTAREA'].includes(document.activeElement?.tagName)) return;
+
+      if (e.key === 'j' || e.key === 'ArrowDown') {
+        e.preventDefault();
+        if (emails.length > 0) {
+          const currentIndex = emails.findIndex((e) => e.id === selectedEmail?.id);
+          const nextIndex = currentIndex < emails.length - 1 ? currentIndex + 1 : 0;
+          setSelectedEmail(emails[nextIndex]);
+        }
+      } else if (e.key === 'k' || e.key === 'ArrowUp') {
+        e.preventDefault();
+        if (emails.length > 0) {
+          const currentIndex = emails.findIndex((e) => e.id === selectedEmail?.id);
+          const prevIndex = currentIndex > 0 ? currentIndex - 1 : emails.length - 1;
+          setSelectedEmail(emails[prevIndex]);
+        }
+      } else if (e.key === 'Escape') {
+        setIsAccountsModalOpen(false);
+        setIsAIChatOpen(false);
+        setIsAgentDrawerOpen(false);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [emails, selectedEmail]);
 
   const loadEmails = async () => {
     setIsLoading(true);
@@ -145,6 +176,8 @@ export default function App() {
         onOpenCopilot={() => setIsAIChatOpen(true)}
         onSimulateEmail={handleSimulateIncoming}
         isSimulating={isSimulating}
+        isCollapsed={isSidebarCollapsed}
+        setIsCollapsed={setIsSidebarCollapsed}
       />
 
       {/* 2. Middle & Right Panes */}

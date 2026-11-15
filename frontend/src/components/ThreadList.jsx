@@ -1,9 +1,6 @@
 import React from 'react';
 import { 
   Search, 
-  Filter, 
-  Clock, 
-  ChevronRight, 
   Mail,
   Flame,
   CheckCircle2
@@ -34,7 +31,7 @@ export default function ThreadList({
   };
 
   return (
-    <div className="w-80 sm:w-96 border-r border-zinc-200 bg-white flex flex-col h-screen select-none shrink-0 font-sans">
+    <div className="w-72 md:w-80 lg:w-84 xl:w-92 border-r border-zinc-200 bg-white flex flex-col h-screen select-none shrink-0 font-sans">
       
       {/* 1. Search Bar */}
       <div className="p-3 border-b border-zinc-200 bg-white">
@@ -50,7 +47,7 @@ export default function ThreadList({
         </div>
 
         {/* Priority Filter chips */}
-        <div className="flex items-center space-x-1.5 mt-2 pt-1 text-[11px] font-medium text-zinc-600 overflow-x-auto scrollbar-none">
+        <div className="flex items-center space-x-1 mt-2 text-[11px] font-medium text-zinc-600 overflow-x-auto scrollbar-none">
           <button
             onClick={() => setPriorityFilter('all')}
             className={`px-2 py-0.5 rounded cursor-pointer ${
@@ -116,13 +113,13 @@ export default function ThreadList({
                 onClick={() => onSelectEmail(email)}
                 className={`p-3.5 transition-all cursor-pointer relative ${
                   isSelected
-                    ? 'bg-zinc-100 border-l-4 border-l-zinc-900'
+                    ? 'bg-zinc-100 border-l-3 border-l-zinc-900'
                     : 'hover:bg-zinc-50/80 bg-white'
                 }`}
               >
                 {/* Header: Sender & Date */}
                 <div className="flex items-center justify-between text-xs mb-1">
-                  <div className="flex items-center space-x-2 truncate pr-2">
+                  <div className="flex items-center space-x-1.5 truncate pr-2">
                     {email.isUnread && (
                       <span className="w-2 h-2 rounded-full bg-blue-600 shrink-0"></span>
                     )}
@@ -130,7 +127,7 @@ export default function ThreadList({
                       {email.sender?.name}
                     </span>
                     {email.sender?.company && (
-                      <span className="text-[10px] text-zinc-400 truncate">
+                      <span className="text-[10px] text-zinc-400 truncate hidden sm:inline">
                         • {email.sender.company}
                       </span>
                     )}
