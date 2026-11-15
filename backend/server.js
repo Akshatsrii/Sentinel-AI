@@ -1,7 +1,7 @@
-require("dotenv").config();
+const path = require("path");
+require("dotenv").config({ path: path.join(__dirname, ".env") });
 const express = require("express");
 const cors = require("cors");
-const path = require("path");
 const connectDB = require("./config/db");
 const emailRoutes = require("./routes/emailRoutes");
 
@@ -21,7 +21,7 @@ app.get("/api/health", (req, res) => {
     status: "ok",
     service: "Proxxy — Executive AI Email & Decision Platform",
     aiEngine: process.env.GEMINI_API_KEY ? "Gemini Live API" : "Enhanced Hybrid AI Heuristics",
-    database: process.env.MONGO_URI && !process.env.MONGO_URI.includes("<db_username>") ? "MongoDB Atlas" : "In-Memory Executive Store",
+    database: process.env.MONGO_URI && !process.env.MONGO_URI.includes("<db_username>") ? "MongoDB Atlas (Connected)" : "In-Memory Executive Store",
     timestamp: new Date().toISOString()
   });
 });
