@@ -3,17 +3,18 @@
 > **AI Full-Stack Engineer Intern Assignment Submission**  
 > An autonomous executive email orchestration platform built to eliminate the delegation bottleneck between Personal Assistants and their clients.
 
-[![Live Deployed App](https://img.shields.io/badge/Live%20Demo-proxxy--3ooz.onrender.com-success?style=for-the-badge&logo=render)](https://proxxy-3ooz.onrender.com)
+[![Vercel Frontend](https://img.shields.io/badge/Vercel%20Frontend-proxxy--cyan.vercel.app-black?style=for-the-badge&logo=vercel)](https://proxxy-cyan.vercel.app/)
+[![Render Full-Stack](https://img.shields.io/badge/Render%20Full--Stack-proxxy--3ooz.onrender.com-success?style=for-the-badge&logo=render)](https://proxxy-3ooz.onrender.com)
 [![Tech Stack](https://img.shields.io/badge/Stack-React%2019%20%7C%20Node.js%20%7C%20Express%205%20%7C%20MongoDB%20Atlas%20%7C%20Gemini%20AI-blue?style=for-the-badge)](#technology-stack)
-[![Status](https://img.shields.io/badge/Status-100%25%20Live%20%26%20Functional-emerald?style=for-the-badge)](#live-deployed-links)
 
 ---
 
 ## 🌐 Live Deployed Links
 
-- **Working Web Application Prototype:** [https://proxxy-3ooz.onrender.com](https://proxxy-3ooz.onrender.com)
-- **API Health Check & Diagnostics:** [https://proxxy-3ooz.onrender.com/api/health](https://proxxy-3ooz.onrender.com/api/health)
-- **Emails REST Endpoint (MongoDB Atlas):** [https://proxxy-3ooz.onrender.com/api/emails](https://proxxy-3ooz.onrender.com/api/emails)
+- **Primary Web App (Vercel):** [https://proxxy-cyan.vercel.app/](https://proxxy-cyan.vercel.app/)
+- **Full-Stack Mirror (Render):** [https://proxxy-3ooz.onrender.com](https://proxxy-3ooz.onrender.com)
+- **API Diagnostics & Health:** [https://proxxy-3ooz.onrender.com/api/health](https://proxxy-3ooz.onrender.com/api/health)
+- **MongoDB Atlas Stream:** [https://proxxy-3ooz.onrender.com/api/emails](https://proxxy-3ooz.onrender.com/api/emails)
 
 ---
 
@@ -78,8 +79,8 @@ A built-in simulator allows testing live AI classification on the fly. When trig
 
 ## 🛠️ Technology Stack
 
-- **Frontend:** React 19, Vite, Tailwind CSS v4, Lucide Icons, Inter & JetBrains Mono typography
-- **Backend:** Node.js, Express 5, CORS, Dotenv
+- **Frontend:** React 19, Vite, Tailwind CSS v4, Lucide Icons, Inter & JetBrains Mono typography (Hosted on Vercel)
+- **Backend:** Node.js, Express 5, CORS, Dotenv (Hosted on Render)
 - **AI Engine:** Google Gemini API (`@google/generative-ai`) with hybrid heuristic fallback engine for 100% demo reliability
 - **Database / State:** MongoDB Atlas ready (`MONGO_URI`) + in-memory store initialized with realistic executive email threads
 

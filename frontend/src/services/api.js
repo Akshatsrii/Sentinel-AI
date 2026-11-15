@@ -1,6 +1,11 @@
-// REST API Service for PA AI Email Platform
+// REST API Service for Proxxy AI Email Platform
 
-const API_BASE = '/api';
+// Automatically route to Render live backend when hosted on Vercel or custom domain
+const API_BASE = 
+  import.meta.env.VITE_API_BASE_URL || 
+  (typeof window !== 'undefined' && window.location.hostname.includes('vercel.app') 
+    ? 'https://proxxy-3ooz.onrender.com/api' 
+    : '/api');
 
 export const api = {
   // Get emails with optional filters
